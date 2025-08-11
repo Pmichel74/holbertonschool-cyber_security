@@ -8,4 +8,4 @@
 # -n: numerical addresses
 # -p: process using the socket
 
-ss -tnp
+sudo ss -tnp
