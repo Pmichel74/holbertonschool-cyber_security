@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Script to show the last 5 login sessions for users with their corresponding dates and times
+# Script to show the last 5 login sessions with dates and times
 
-last -5
+sudo last -F -5
