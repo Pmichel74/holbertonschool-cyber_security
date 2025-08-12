@@ -10,193 +10,193 @@
 </div>
 
 ## 📖 Description
-Ce projet fait partie du curriculum de cybersécurité de **Holberton School**. Il couvre les concepts fondamentaux de sécurité informatique à travers des scripts bash pratiques qui démontrent diverses techniques de sécurité essentielles.
+This project is part of the **Holberton School** cybersecurity curriculum. It covers fundamental computer security concepts through practical bash scripts that demonstrate various essential security techniques.
 
-## 🎯 Objectifs d'apprentissage
-À la fin de ce projet, vous devriez être capable d'expliquer :
-- 🔍 Comment identifier la version du système d'exploitation
-- 🔐 Les techniques de génération de mots de passe sécurisés
-- ✅ La validation d'intégrité de fichiers avec SHA256
-- 🔑 La génération et gestion de clés SSH
-- ⚙️ L'identification des processus système critiques
+## 🎯 Learning Objectives
+By the end of this project, you should be able to explain:
+- 🔍 How to identify the operating system version
+- 🔐 Secure password generation techniques
+- ✅ File integrity validation with SHA256
+- 🔑 SSH key generation and management
+- ⚙️ Critical system process identification
 
 ## 🖥️ Environnement
 - **OS** : Ubuntu 20.04 LTS 🐧
 - **Shell** : Bash 💻
 - **Style** : Scripts conformes aux standards Holberton ✨
 
-## 📂 Liste des fichiers
+## 📂 File List
 
 ### 🆔 0-release.sh
-> **🎯 Mission** : Script qui affiche la distribution Linux utilisée  
+> **🎯 Mission** : Script that displays the Linux distribution used  
 > **🚀 Usage** : `./0-release.sh`  
-> **📤 Sortie** : Nom de la distribution (ex: Ubuntu)
+> **📤 Output** : Distribution name (ex: Ubuntu)
 
 ### 🔑 1-gen_password.sh
-> **🎯 Mission** : Générateur de mots de passe aléatoires sécurisés  
-> **🚀 Usage** : `./1-gen_password.sh [longueur]`  
-> **⚙️ Paramètres** :
-> - `longueur` (optionnel) : Nombre de caractères du mot de passe (défaut: 20)
+> **🎯 Mission** : Secure random password generator  
+> **🚀 Usage** : `./1-gen_password.sh [length]`  
+> **⚙️ Parameters** :
+> - `length` (optional) : Number of characters in password (default: 20)
 > 
-> **🔒 Caractéristiques** :
-> - ✅ Utilise uniquement des caractères alphanumériques
-> - 🎲 Source d'entropie : `/dev/urandom`
-> - 🛡️ Pas de caractères spéciaux pour éviter les problèmes d'échappement
+> **🔒 Features** :
+> - ✅ Uses only alphanumeric characters
+> - 🎲 Entropy source : `/dev/urandom`
+> - 🛡️ No special characters to avoid escaping issues
 
 ### 📊 2-sha256_validator.sh
-> **🎯 Mission** : Validateur d'intégrité de fichiers utilisant SHA256  
-> **🚀 Usage** : `./2-sha256_validator.sh <fichier> <hash_attendu>`  
-> **⚙️ Paramètres** :
-> - `fichier` : Chemin vers le fichier à vérifier
-> - `hash_attendu` : Hash SHA256 attendu en hexadécimal
+> **🎯 Mission** : File integrity validator using SHA256  
+> **🚀 Usage** : `./2-sha256_validator.sh <file> <expected_hash>`  
+> **⚙️ Parameters** :
+> - `file` : Path to file to verify
+> - `expected_hash` : Expected SHA256 hash in hexadecimal
 > 
-> **📤 Sortie** : 
-> - ✅ `<fichier>: OK` si le hash correspond
-> - ❌ `<fichier>: FAILED` si le hash ne correspond pas
+> **📤 Output** : 
+> - ✅ `<file>: OK` if hash matches
+> - ❌ `<file>: FAILED` if hash doesn't match
 
 ### 🔐 3-gen_key.sh
-> **🎯 Mission** : Générateur de paires de clés SSH RSA  
-> **🚀 Usage** : `./3-gen_key.sh <nom_clé>`  
-> **⚙️ Paramètres** :
-> - `nom_clé` : Nom de base pour les fichiers de clés
+> **🎯 Mission** : SSH RSA key pair generator  
+> **🚀 Usage** : `./3-gen_key.sh <key_name>`  
+> **⚙️ Parameters** :
+> - `key_name` : Base name for key files
 > 
-> **🔒 Caractéristiques** :
-> - 🔢 Génère une clé RSA de 4096 bits
-> - 🚫 Pas de phrase de passe (pour l'automatisation)
-> - 📁 Crée deux fichiers : `<nom_clé>` (privée) et `<nom_clé>.pub` (publique)
+> **🔒 Features** :
+> - 🔢 Generates 4096-bit RSA key
+> - 🚫 No passphrase (for automation)
+> - 📁 Creates two files : `<key_name>` (private) and `<key_name>.pub` (public)
 
 ### 👁️ 4-root_process.sh
-> **🎯 Mission** : Identifie les processus tournant avec des privilèges spécifiques  
-> **🚀 Usage** : `./4-root_process.sh <utilisateur>`  
-> **⚙️ Paramètres** :
-> - `utilisateur` : Nom d'utilisateur dont on veut lister les processus
+> **🎯 Mission** : Identifies processes running with specific privileges  
+> **🚀 Usage** : `./4-root_process.sh <user>`  
+> **⚙️ Parameters** :
+> - `user` : Username whose processes to list
 > 
-> **🧠 Fonctionnalité** : Exclut les processus kernel (PID 0, PPID 0)
+> **🧠 Functionality** : Excludes kernel processes (PID 0, PPID 0)
 
-## 📁 Fichiers auxiliaires
+## 📁 Auxiliary Files
 
 ### 🔐 new_key / new_key.pub
-> **📝 Description** : Exemple de paire de clés SSH générée par le script `3-gen_key.sh`
+> **📝 Description** : Example SSH key pair generated by `3-gen_key.sh` script
 
 ### 🧪 test_file
-> **📝 Description** : Fichier de test vide utilisé pour les démonstrations de validation SHA256
+> **📝 Description** : Empty test file used for SHA256 validation demonstrations
 
 ---
 
-## 🚀 Installation et utilisation
+## 🚀 Installation and Usage
 
-### 1️⃣ **Cloner le repository** :
+### 1️⃣ **Clone the repository** :
 ```bash
 git clone https://github.com/Pmichel74/holbertonschool-cyber_security.git
 cd holbertonschool-cyber_security/cybersecurity_basics/0x00_introduction_cybersecurity
 ```
 
-### 2️⃣ **Rendre les scripts exécutables** :
+### 2️⃣ **Make scripts executable** :
 ```bash
 chmod +x *.sh
 ```
 
-### 3️⃣ **Exemples d'utilisation** :
+### 3️⃣ **Usage examples** :
 
 <details>
-<summary>🔍 <strong>Identifier la distribution</strong></summary>
+<summary>🔍 <strong>Identify the distribution</strong></summary>
 
 ```bash
 ./0-release.sh
-# Sortie : Ubuntu
+# Output : Ubuntu
 ```
 </details>
 
 <details>
-<summary>🔐 <strong>Générer un mot de passe de 32 caractères</strong></summary>
+<summary>🔐 <strong>Generate a 32-character password</strong></summary>
 
 ```bash
 ./1-gen_password.sh 32
-# Sortie : 8kF9mN2pQ7xR5tY1wE3nI6oU4sA0hG2z
+# Output : 8kF9mN2pQ7xR5tY1wE3nI6oU4sA0hG2z
 ```
 </details>
 
 <details>
-<summary>✅ <strong>Valider un fichier avec son hash SHA256</strong></summary>
+<summary>✅ <strong>Validate a file with its SHA256 hash</strong></summary>
 
 ```bash
 ./2-sha256_validator.sh test_file e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-# Sortie : test_file: OK
+# Output : test_file: OK
 ```
 </details>
 
 <details>
-<summary>🔑 <strong>Générer une nouvelle paire de clés SSH</strong></summary>
+<summary>🔑 <strong>Generate a new SSH key pair</strong></summary>
 
 ```bash
-./3-gen_key.sh ma_nouvelle_cle
-# Crée : ma_nouvelle_cle (privée) + ma_nouvelle_cle.pub (publique)
+./3-gen_key.sh my_new_key
+# Creates : my_new_key (private) + my_new_key.pub (public)
 ```
 </details>
 
 <details>
-<summary>👁️ <strong>Lister les processus de l'utilisateur root</strong></summary>
+<summary>👁️ <strong>List root user processes</strong></summary>
 
 ```bash
 ./4-root_process.sh root
-# Affiche tous les processus de root (sauf kernel)
+# Shows all root processes (except kernel)
 ```
 </details>
 
 ---
 
-## 🧠 Concepts de sécurité abordés
+## 🧠 Security Concepts Covered
 
 <table>
 <tr>
 <td align="center">
-<h3>🔍 Identification du système</h3>
-<p>• Reconnaissance de l'environnement<br>
-• Fingerprinting passif<br>
-• Collecte d'informations système</p>
+<h3>🔍 System Identification</h3>
+<p>• Environment reconnaissance<br>
+• Passive fingerprinting<br>
+• System information gathering</p>
 </td>
 <td align="center">
-<h3>🔐 Génération de mots de passe</h3>
-<p>• Entropie cryptographique<br>
-• Sources de randomness sécurisées<br>
-• Bonnes pratiques de génération</p>
+<h3>🔐 Password Generation</h3>
+<p>• Cryptographic entropy<br>
+• Secure randomness sources<br>
+• Generation best practices</p>
 </td>
 </tr>
 <tr>
 <td align="center">
-<h3>✅ Intégrité des données</h3>
-<p>• Fonctions de hachage cryptographiques<br>
-• Validation d'intégrité<br>
-• Détection de tampering</p>
+<h3>✅ Data Integrity</h3>
+<p>• Cryptographic hash functions<br>
+• Integrity validation<br>
+• Tampering detection</p>
 </td>
 <td align="center">
-<h3>🔑 Cryptographie asymétrique</h3>
-<p>• Paires de clés publique/privée<br>
-• Authentification SSH<br>
-• Gestion des clés</p>
+<h3>🔑 Asymmetric Cryptography</h3>
+<p>• Public/private key pairs<br>
+• SSH authentication<br>
+• Key management</p>
 </td>
 </tr>
 <tr>
 <td align="center" colspan="2">
-<h3>⚙️ Analyse des processus</h3>
-<p>• Monitoring système • Identification des services critiques • Analyse de sécurité</p>
+<h3>⚙️ Process Analysis</h3>
+<p>• System monitoring • Critical service identification • Security analysis</p>
 </td>
 </tr>
 </table>
 
 ---
 
-## ⚠️ Sécurité et bonnes pratiques
+## ⚠️ Security and Best Practices
 
 <div align="center">
 
-| ⚠️ **Avertissements de sécurité** |
+| ⚠️ **Security Warnings** |
 |---|
-| 🚫 Les clés SSH générées sans phrase de passe sont moins sécurisées |
-| 🔒 Protégez toujours vos clés privées (permissions 600) |
-| 🙅‍♂️ Ne partagez jamais vos clés privées |
-| 💪 Utilisez des mots de passe forts en production |
-| ✅ Validez toujours l'intégrité des fichiers critiques |
+| 🚫 SSH keys generated without passphrase are less secure |
+| 🔒 Always protect your private keys (permissions 600) |
+| 🙅‍♂️ Never share your private keys |
+| 💪 Use strong passwords in production |
+| ✅ Always validate integrity of critical files |
 
 </div>
 
