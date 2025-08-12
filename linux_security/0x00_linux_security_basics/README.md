@@ -10,265 +10,265 @@
 </div>
 
 ## 📖 Description
-Ce projet fait partie du curriculum de cybersécurité de **Holberton School**, spécialisé dans la sécurité Linux. Il couvre les concepts essentiels de sécurité système, surveillance réseau, configuration de pare-feu, et audit de sécurité à travers des scripts bash pratiques.
+This project is part of the **Holberton School** cybersecurity curriculum, specializing in Linux security. It covers essential system security concepts, network monitoring, firewall configuration, and security auditing through practical bash scripts.
 
-## 🎯 Objectifs d'apprentissage
-À la fin de ce projet, vous devriez maîtriser :
-- 📊 L'analyse des sessions de connexion et logs système
-- 🌐 La surveillance des connexions réseau actives
-- 🔥 La configuration et gestion des pare-feu (UFW/iptables)
-- 🔍 L'audit de sécurité système avec Lynis
-- 📡 La capture et analyse du trafic réseau
-- 🗺️ La découverte réseau et scan de vulnérabilités
+## 🎯 Learning Objectives
+By the end of this project, you should master:
+- 📊 Login session and system log analysis
+- 🌐 Active network connection monitoring
+- 🔥 Firewall configuration and management (UFW/iptables)
+- 🔍 System security auditing with Lynis
+- 📡 Network traffic capture and analysis
+- 🗺️ Network discovery and vulnerability scanning
 
-## 🖥️ Environnement
+## 🖥️ Environment
 - **OS** : Ubuntu 20.04 LTS 🐧
 - **Shell** : Bash 💻
-- **Outils** : UFW, iptables, netstat, ss, tcpdump, nmap, lynis 🛠️
-- **Privilèges** : sudo requis 🔐
+- **Tools** : UFW, iptables, netstat, ss, tcpdump, nmap, lynis 🛠️
+- **Privileges** : sudo required 🔐
 
 ---
 
-## 📂 Liste des scripts
+## 📂 Scripts List
 
 ### 📋 0-login.sh
-> **🎯 Mission** : Affiche les 5 dernières sessions de connexion avec dates et heures  
+> **🎯 Mission** : Display the last 5 login sessions with dates and times  
 > **🚀 Usage** : `./0-login.sh`  
-> **🔧 Commande** : `sudo last -F -5`  
-> **📤 Sortie** : Historique détaillé des connexions utilisateurs
+> **🔧 Command** : `sudo last -F -5`  
+> **📤 Output** : Detailed user connection history
 
 ### 🌐 1-active-connections.sh
-> **🎯 Mission** : Affiche toutes les connexions réseau actives avec informations des processus  
+> **🎯 Mission** : Display all active network connections with process information  
 > **🚀 Usage** : `./1-active-connections.sh`  
-> **🔧 Commande** : `sudo ss -tanp`  
-> **📊 Fonctionnalités** :
-> - ✅ Sockets TCP (-t)
-> - 🔢 Adresses numériques (-n)
-> - 🏷️ Processus associés (-p)
-> - 📡 Ports d'écoute et connexions établies
+> **🔧 Command** : `sudo ss -tanp`  
+> **📊 Features** :
+> - ✅ TCP sockets (-t)
+> - 🔢 Numerical addresses (-n)
+> - 🏷️ Associated processes (-p)
+> - 📡 Listening ports and established connections
 
 ### 🚪 2-incoming_connections.sh
-> **🎯 Mission** : Configure le pare-feu UFW pour autoriser les connexions TCP sur le port 80  
+> **🎯 Mission** : Configure UFW firewall to allow TCP connections on port 80  
 > **🚀 Usage** : `./2-incoming_connections.sh`  
 > **⚙️ Actions** :
-> - 🔄 Reset complet du pare-feu
-> - 🚫 Blocage par défaut des connexions entrantes
-> - ✅ Autorisation du port 80/TCP
-> - 🔥 Activation du pare-feu
+> - 🔄 Complete firewall reset
+> - 🚫 Default deny incoming connections
+> - ✅ Allow port 80/TCP
+> - 🔥 Firewall activation
 
 ### 📋 3-firewall_rules.sh
-> **🎯 Mission** : Liste toutes les règles de la table security d'iptables  
+> **🎯 Mission** : List all rules from iptables security table  
 > **🚀 Usage** : `./3-firewall_rules.sh`  
-> **🔧 Commande** : `sudo iptables -t security -L -v`  
-> **📊 Sortie** : Règles détaillées avec statistiques de paquets
+> **🔧 Command** : `sudo iptables -t security -L -v`  
+> **📊 Output** : Detailed rules with packet statistics
 
 ### 🔌 4-network_services.sh
-> **🎯 Mission** : Liste tous les services réseau, leurs états et ports d'écoute  
+> **🎯 Mission** : List all network services, their states and listening ports  
 > **🚀 Usage** : `./4-network_services.sh`  
-> **🔧 Commande** : `sudo netstat -lntup`  
-> **📊 Informations** :
-> - 👂 Services en écoute (-l)
-> - 🔢 Adresses numériques (-n)
-> - 🌐 TCP et UDP (-tu)
-> - 🆔 PID des processus (-p)
+> **🔧 Command** : `sudo netstat -lntup`  
+> **📊 Information** :
+> - 👂 Listening services (-l)
+> - 🔢 Numerical addresses (-n)
+> - 🌐 TCP and UDP (-tu)
+> - 🆔 Process PID (-p)
 
 ### 🔍 5-audit_system.sh
-> **🎯 Mission** : Lance un audit complet de sécurité système avec Lynis  
+> **🎯 Mission** : Launch complete system security audit with Lynis  
 > **🚀 Usage** : `./5-audit_system.sh`  
-> **🔧 Commande** : `sudo lynis audit system`  
-> **📊 Analyse** :
-> - 🛡️ Configuration de sécurité
-> - 🔓 Vulnérabilités potentielles
-> - 📝 Recommandations d'amélioration
+> **🔧 Command** : `sudo lynis audit system`  
+> **📊 Analysis** :
+> - 🛡️ Security configuration
+> - 🔓 Potential vulnerabilities
+> - 📝 Improvement recommendations
 
 ### 📡 6-capture_analyze.sh
-> **🎯 Mission** : Capture et analyse le trafic réseau en temps réel  
+> **🎯 Mission** : Capture and analyze network traffic in real-time  
 > **🚀 Usage** : `./6-capture_analyze.sh`  
-> **🔧 Commande** : `sudo tcpdump -c 5 -i any`  
-> **⚙️ Paramètres** :
-> - 📦 Capture 5 paquets (-c 5)
-> - 🌐 Toutes les interfaces (-i any)
+> **🔧 Command** : `sudo tcpdump -c 5 -i any`  
+> **⚙️ Parameters** :
+> - 📦 Capture 5 packets (-c 5)
+> - 🌐 All interfaces (-i any)
 
 ### 🗺️ 7-scan.sh
-> **🎯 Mission** : Scan d'un sous-réseau pour découvrir les hôtes actifs  
-> **🚀 Usage** : `./7-scan.sh <sous-réseau>`  
-> **🔧 Commande** : `sudo nmap <sous-réseau>`  
-> **📊 Exemple** : `./7-scan.sh 192.168.1.0/24`
+> **🎯 Mission** : Scan a subnet to discover active hosts  
+> **🚀 Usage** : `./7-scan.sh <subnet>`  
+> **🔧 Command** : `sudo nmap <subnet>`  
+> **📊 Example** : `./7-scan.sh 192.168.1.0/24`
 
 ---
 
-## 🚀 Installation et utilisation
+## 🚀 Installation and Usage
 
-### 1️⃣ **Prérequis - Installation des outils** :
+### 1️⃣ **Prerequisites - Tool Installation** :
 ```bash
 sudo apt update
 sudo apt install ufw iptables-persistent net-tools tcpdump nmap lynis
 ```
 
-### 2️⃣ **Cloner le repository** :
+### 2️⃣ **Clone the repository** :
 ```bash
 git clone https://github.com/Pmichel74/holbertonschool-cyber_security.git
 cd holbertonschool-cyber_security/linux_security/0x00_linux_security_basics
 ```
 
-### 3️⃣ **Rendre les scripts exécutables** :
+### 3️⃣ **Make scripts executable** :
 ```bash
 chmod +x *.sh
 ```
 
-### 4️⃣ **Exemples d'utilisation** :
+### 4️⃣ **Usage examples** :
 
 <details>
-<summary>📋 <strong>Analyser les dernières connexions</strong></summary>
+<summary>📋 <strong>Analyze recent logins</strong></summary>
 
 ```bash
 ./0-login.sh
-# Sortie : Liste des 5 dernières sessions avec timestamps complets
+# Output: List of last 5 sessions with full timestamps
 ```
 </details>
 
 <details>
-<summary>🌐 <strong>Surveiller les connexions actives</strong></summary>
+<summary>🌐 <strong>Monitor active connections</strong></summary>
 
 ```bash
 ./1-active-connections.sh
-# Affiche : Ports d'écoute, connexions établies + PID des processus
+# Shows: Listening ports, established connections + process PIDs
 ```
 </details>
 
 <details>
-<summary>🚪 <strong>Configurer le pare-feu pour HTTP</strong></summary>
+<summary>🚪 <strong>Configure firewall for HTTP</strong></summary>
 
 ```bash
 ./2-incoming_connections.sh
-# Actions : Reset UFW + Autorisation port 80 + Activation
+# Actions: Reset UFW + Allow port 80 + Activation
 ```
 </details>
 
 <details>
-<summary>📋 <strong>Vérifier les règles iptables</strong></summary>
+<summary>📋 <strong>Check iptables rules</strong></summary>
 
 ```bash
 ./3-firewall_rules.sh
-# Affiche : Toutes les règles de la table security
+# Shows: All security table rules
 ```
 </details>
 
 <details>
-<summary>🔌 <strong>Lister les services réseau</strong></summary>
+<summary>🔌 <strong>List network services</strong></summary>
 
 ```bash
 ./4-network_services.sh
-# Sortie : Services + États + Ports + PID
+# Output: Services + States + Ports + PID
 ```
 </details>
 
 <details>
-<summary>🔍 <strong>Audit de sécurité complet</strong></summary>
+<summary>🔍 <strong>Complete security audit</strong></summary>
 
 ```bash
 ./5-audit_system.sh
-# Lance : Scan Lynis avec rapport détaillé
+# Launches: Lynis scan with detailed report
 ```
 </details>
 
 <details>
-<summary>📡 <strong>Capturer le trafic réseau</strong></summary>
+<summary>📡 <strong>Capture network traffic</strong></summary>
 
 ```bash
 ./6-capture_analyze.sh
-# Capture : 5 paquets sur toutes les interfaces
+# Captures: 5 packets on all interfaces
 ```
 </details>
 
 <details>
-<summary>🗺️ <strong>Scanner un réseau local</strong></summary>
+<summary>🗺️ <strong>Scan local network</strong></summary>
 
 ```bash
 ./7-scan.sh 192.168.1.0/24
-# Découvre : Tous les hôtes actifs du sous-réseau
+# Discovers: All active hosts in subnet
 ```
 </details>
 
 ---
 
-## 🧠 Concepts de sécurité abordés
+## 🧠 Security Concepts Covered
 
 <table>
 <tr>
 <td align="center">
-<h3>📊 Surveillance des accès</h3>
-<p>• Analyse des logs de connexion<br>
-• Tracking des sessions utilisateurs<br>
-• Détection d'activités suspectes</p>
+<h3>📊 Access Monitoring</h3>
+<p>• Login log analysis<br>
+• User session tracking<br>
+• Suspicious activity detection</p>
 </td>
 <td align="center">
-<h3>🌐 Monitoring réseau</h3>
-<p>• Surveillance des connexions actives<br>
-• Identification des services exposés<br>
-• Analyse du trafic réseau</p>
+<h3>🌐 Network Monitoring</h3>
+<p>• Active connection surveillance<br>
+• Exposed service identification<br>
+• Network traffic analysis</p>
 </td>
 </tr>
 <tr>
 <td align="center">
-<h3>🔥 Sécurité périmétrique</h3>
-<p>• Configuration de pare-feu UFW<br>
-• Gestion des règles iptables<br>
-• Contrôle des flux réseau</p>
+<h3>🔥 Perimeter Security</h3>
+<p>• UFW firewall configuration<br>
+• iptables rules management<br>
+• Network flow control</p>
 </td>
 <td align="center">
-<h3>🔍 Audit et évaluation</h3>
-<p>• Scan de vulnérabilités<br>
-• Évaluation de la posture sécuritaire<br>
-• Recommandations d'hardening</p>
+<h3>🔍 Audit and Assessment</h3>
+<p>• Vulnerability scanning<br>
+• Security posture evaluation<br>
+• Hardening recommendations</p>
 </td>
 </tr>
 <tr>
 <td align="center" colspan="2">
-<h3>🗺️ Reconnaissance réseau</h3>
-<p>• Découverte d'hôtes • Cartographie réseau • Analyse de la topologie</p>
+<h3>🗺️ Network Reconnaissance</h3>
+<p>• Host discovery • Network mapping • Topology analysis</p>
 </td>
 </tr>
 </table>
 
 ---
 
-## ⚠️ Sécurité et bonnes pratiques
+## ⚠️ Security and Best Practices
 
 <div align="center">
 
-| 🚨 **Avertissements critiques** |
+| 🚨 **Critical Warnings** |
 |---|
-| 🛡️ **Toujours** tester les règles de pare-feu en environnement de test |
-| 🔐 Ces scripts nécessitent des **privilèges sudo** |
-| 📝 **Documenter** toutes les modifications de configuration |
-| 🚫 **Ne jamais** scanner des réseaux sans autorisation |
-| 📊 **Monitorer** régulièrement les logs pour détecter les anomalies |
-| 🔒 **Sauvegarder** les configurations avant modifications |
+| 🛡️ **Always** test firewall rules in test environment |
+| 🔐 These scripts require **sudo privileges** |
+| 📝 **Document** all configuration changes |
+| 🚫 **Never** scan networks without authorization |
+| 📊 **Monitor** logs regularly to detect anomalies |
+| 🔒 **Backup** configurations before modifications |
 
 </div>
 
 ---
 
-## 🛠️ Outils utilisés
+## 🛠️ Tools Used
 
 <div align="center">
 
-| Outil | Usage | Description |
+| Tool | Usage | Description |
 |-------|-------|-------------|
-| 📋 **last** | Logs de connexion | Historique des sessions utilisateurs |
-| 🌐 **ss/netstat** | Connexions réseau | Surveillance des sockets et services |
-| 🔥 **UFW** | Pare-feu simple | Interface simplifiée pour iptables |
-| 📊 **iptables** | Pare-feu avancé | Filtrage de paquets au niveau noyau |
-| 🔍 **Lynis** | Audit sécurité | Scanner de vulnérabilités système |
-| 📡 **tcpdump** | Capture réseau | Analyse du trafic en temps réel |
-| 🗺️ **nmap** | Découverte réseau | Scanner de ports et services |
+| 📋 **last** | Login logs | User session history |
+| 🌐 **ss/netstat** | Network connections | Socket and service monitoring |
+| 🔥 **UFW** | Simple firewall | Simplified interface for iptables |
+| 📊 **iptables** | Advanced firewall | Kernel-level packet filtering |
+| 🔍 **Lynis** | Security audit | System vulnerability scanner |
+| 📡 **tcpdump** | Network capture | Real-time traffic analysis |
+| 🗺️ **nmap** | Network discovery | Port and service scanner |
 
 </div>
 
 ---
 
-## 👨‍💻 Auteur
+## 👨‍💻 Author
 
 <div align="center">
 
@@ -279,7 +279,7 @@ chmod +x *.sh
 
 ---
 
-## 🏫 Projet
+## 🏫 Project
 
 <div align="center">
 
