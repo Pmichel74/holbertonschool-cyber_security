@@ -1,2 +1,2 @@
 #!/bin/bash
-nslookup $1 8.8.8.8
+nslookup -type=a $1 8.8.8.8
