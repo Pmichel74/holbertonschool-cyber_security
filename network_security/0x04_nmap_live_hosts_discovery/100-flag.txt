@@ -1,1 +1,1 @@
-sudo nmap -sU -sV -p200-300 cybernetsec_0x04
+084ccac702369d67e1432e6ab7b336f4
