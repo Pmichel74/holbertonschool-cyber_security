@@ -1,0 +1,1 @@
+sudo nmap -sU -sV -p200-300 cybernetsec_0x04
