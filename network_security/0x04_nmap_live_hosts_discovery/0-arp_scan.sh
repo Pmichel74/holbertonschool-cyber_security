@@ -1,1 +1,1 @@
-sudo nmap -sN -PR $1
+sudo nmap -sn -PR $1
