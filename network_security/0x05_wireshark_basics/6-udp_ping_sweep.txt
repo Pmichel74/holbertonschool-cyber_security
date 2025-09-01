@@ -1,1 +1,1 @@
-udp.dstport == 40125 && udp.srcport > 1024
+udp.dstport == 40125 
