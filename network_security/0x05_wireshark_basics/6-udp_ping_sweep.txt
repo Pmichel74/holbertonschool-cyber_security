@@ -1,1 +1,1 @@
-udp.length == 8
+udp.srcport > 32768 and udp.length == 8
