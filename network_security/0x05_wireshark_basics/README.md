@@ -169,8 +169,8 @@ nmap -sU 192.168.1.1
 
 **Patrick Michel**
 - 🏫 Holberton School - Cybersecurity Track
-- 📧 Contact: [Your Email]
-- 🐙 GitHub: [Your GitHub]
+- 📧 Contact: [patrick.yann.michel@gmail.com]
+- 🐙 GitHub: [Pmichel74]
 
 ---
 
