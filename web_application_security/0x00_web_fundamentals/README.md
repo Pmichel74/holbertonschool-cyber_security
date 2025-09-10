@@ -18,8 +18,6 @@ This project explores fundamental web application vulnerabilities and associated
   - [7. Admin Panel RCE](#7-admin-panel-rce)
   - [8. Catch The FLAG #4](#8-catch-the-flag-4)
 - [🔧 Installation and Configuration](#-installation-and-configuration)
-- [⚠️ Ethical Warnings](#️-ethical-warnings)
-- [📚 Additional Resources](#-additional-resources)
 
 ## 📖 Description
 
