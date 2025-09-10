@@ -247,33 +247,7 @@ sudo apt update
 sudo apt install curl python3 netcat sqlmap firefox
 ```
 
-## ⚠️ Ethical Warnings
 
-> **🚨 IMPORTANT: Ethical use only**
-> 
-> This project is intended **exclusively** for educational purposes in a controlled environment. Using these techniques on systems without explicit authorization is **illegal** and **unethical**.
-> 
-> **Rules to follow:**
-> - ✅ Use only on the provided test environment
-> - ✅ Respect legal and ethical framework
-> - ❌ Never apply to production systems
-> - ❌ Do not use for malicious purposes
-
-## 📚 Additional Resources
-
-### Official Documentation
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [OWASP XSS Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
-- [OWASP SQL Injection Prevention](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
-
-### Mentioned Tools
-- [sqlmap](http://sqlmap.org/) - Automated SQL exploitation tool
-- [Netcat](https://netcat.sourceforge.net/) - Versatile networking tool
-- [Curl](https://curl.se/) - Command-line HTTP client
-
-### Additional Reading
-- [Web Security Academy](https://portswigger.net/web-security)
-- [SANS Web Application Security](https://www.sans.org/cyber-security-courses/web-app-penetration-testing-ethical-hacking/)
 
 ---
 
