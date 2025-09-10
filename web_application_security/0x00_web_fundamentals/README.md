@@ -205,7 +205,6 @@ Create a payload that exploits insufficient input validation in the admin ping f
 - Grant execute permissions
 - Display version with `-V` option
 
-**🔗 Netcat URL:** `https://github.com/yunchih/static-binaries/raw/master/nc`
 
 ---
 
