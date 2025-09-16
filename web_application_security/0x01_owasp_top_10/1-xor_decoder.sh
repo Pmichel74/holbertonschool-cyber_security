@@ -1,26 +1,26 @@
 #!/bin/bash
 
-# Get the first argument passed to the script
-input_data="$1"
+# Récupère le premier argument passé au script
+password="$1"
 
-# Remove the {xor} prefix from the string
-input_data="${input_data#'{xor}'}"
+# Supprime le préfixe {xor} de la chaîne
+password="${password#'{xor}'}"
 
-# Decode the Base64 encoded string
-decoded_data=$(echo -n "$input_data" | base64 -d)
+# Decode la chaîne encodée en Base64
+decoded_password=$(echo -n "$password" | openssl enc -base64 -d)
 
-# Initialize the variable to store the XOR operation result
+# Initialise la variable pour stocker le résultat de l'opération XOR
 output=""
 
-# Loop through each character of the string
-for ((i = 0; i < ${#decoded_data}; i++)); do
-    # Get the character at the current position
-    char="${decoded_data:$i:1}"
-    # Convert the character to its ASCII code and perform XOR operation with 95
+# Parcourt chaque caractère de la chaîne
+for ((i = 0; i < ${#decoded_password}; i++)); do
+    # Récupère le caractère à la position actuelle
+    char="${decoded_password:$i:1}"
+    # Convertit le caractère en son code ASCII et effectue l'opération XOR avec 95
     xor_result=$(( $(printf "%d" "'$char") ^ 95 ))
-    # Convert the XOR result to character and add it to the output
-    output+=$(printf "\x$(printf '%02x' $xor_result)")
+    # Ajoute le résultat à la variable de sortie
+    output+=$(printf "\\$(printf '%03o' $xor_result)")
 done
 
-# Display the result
+# Affiche le résultat
 echo "$output"
