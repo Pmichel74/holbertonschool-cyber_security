@@ -1,0 +1,7 @@
+# Manuel personnel - ne pas versionner
+Manuel_Complet_SQL_Injection_Holberton.md
+
+# Autres fichiers personnels
+*.backup
+*.tmp
+notes.txt
