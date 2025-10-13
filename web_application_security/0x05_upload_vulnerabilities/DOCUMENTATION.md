@@ -14,35 +14,37 @@ Identifier le sous-domaine vulnérable de l'application web.
 
 ### Méthodologie
 
-1. **Reconnaissance DNS**
-   - Effectuer une énumération de sous-domaines sur `web0x05.hbtn`
-   - Utiliser des outils comme `subfinder`, `amass`, ou `dnsenum`
+1. **Énumération de Virtual Hosts avec Gobuster**
 
-2. **Méthodes d'énumération**
+   Utiliser `gobuster` en mode `vhost` pour énumérer les sous-domaines :
 
-   **Option A : Subfinder**
    ```bash
-   subfinder -d web0x05.hbtn
+   gobuster vhost -u http://web0x05.hbtn \
+                  -w /usr/share/wordlists/seclists/Discovery/DNS/n0kovo_subdomains.txt \
+                  -t 800 \
+                  --append-domain
    ```
 
-   **Option B : DNSenum**
-   ```bash
-   dnsenum web0x05.hbtn
+   **Explication des paramètres** :
+   - `vhost` : Mode d'énumération de virtual hosts
+   - `-u` : URL de base du domaine cible
+   - `-w` : Wordlist de sous-domaines (n0kovo_subdomains est complète et efficace)
+   - `-t 800` : Nombre de threads (800 pour une énumération rapide)
+   - `--append-domain` : Ajoute automatiquement le domaine de base aux mots de la wordlist
+
+2. **Analyse des résultats**
+
+   Gobuster affichera les sous-domaines trouvés avec leur code de statut HTTP :
+   ```
+   Found: test-s3.web0x05.hbtn (Status: 200)
    ```
 
-   **Option C : Brute-force avec wordlist**
-   ```bash
-   ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
-        -u http://FUZZ.web0x05.hbtn \
-        -mc 200,301,302
-   ```
+3. **Vérification manuelle**
 
-3. **Test manuel**
-   - Tester des sous-domaines communs :
-     - `admin.web0x05.hbtn`
-     - `test.web0x05.hbtn`
-     - `dev.web0x05.hbtn`
-     - `staging.web0x05.hbtn`
+   Une fois le sous-domaine identifié, le tester dans un navigateur :
+   ```bash
+   curl -I http://test-s3.web0x05.hbtn
+   ```
 
 ### Résultat
 
@@ -269,10 +271,10 @@ curl http://test-s3.web0x05.hbtn/static/upload/payload.php
 
 ## Outils utilisés
 
+- **Gobuster** : Énumération de virtual hosts et sous-domaines
 - **Burp Suite** : Proxy d'interception HTTP
 - **Firefox** : Navigateur avec configuration proxy
 - **curl** : Client HTTP en ligne de commande
-- **subfinder/dnsenum** : Énumération de sous-domaines
 
 ---
 
