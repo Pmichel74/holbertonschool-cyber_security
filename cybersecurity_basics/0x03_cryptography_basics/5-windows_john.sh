@@ -1,2 +1,2 @@
 #!/bin/bash
-john --show hash.txt
+john --show --format=NT hash.txt
