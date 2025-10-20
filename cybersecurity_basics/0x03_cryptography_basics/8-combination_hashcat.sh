@@ -1,1 +1,1 @@
-hashcat -a 1 --stdout $1 $2
+hashcat --stdout -a 1 $1 $2
