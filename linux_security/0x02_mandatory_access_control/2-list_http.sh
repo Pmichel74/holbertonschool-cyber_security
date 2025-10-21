@@ -1,2 +1,3 @@
 #!/bin/bash
-seamanage port -l
+semanage port -l | grep http
+
