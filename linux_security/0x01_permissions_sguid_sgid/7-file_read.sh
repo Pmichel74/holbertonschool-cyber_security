@@ -1,2 +1,2 @@
 #!/bin/bash
-find $1 -type f -exec -perm -2000 \; 2>/dev/null
+find $1 -type f -exec -chmod o=r {} \; 2>/dev/null
