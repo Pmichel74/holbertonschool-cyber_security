@@ -6,7 +6,7 @@
 ![Bash](https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)
 ![Security](https://img.shields.io/badge/Security-FF0000?style=for-the-badge&logo=security&logoColor=white)
 
-**Maîtrisez les permissions Linux et les bits spéciaux SUID/SGID** 🛡️
+**Master Linux permissions and special SUID/SGID bits** 🛡️
 
 </div>
 
@@ -14,18 +14,492 @@
 
 ## 📚 Description
 
-Bienvenue dans ce projet passionnant sur la **sécurité Linux** ! 🚀
+Welcome to this exciting project on **Linux security**! 🚀
 
-Ce projet explore en profondeur les mécanismes de permissions sous Linux, avec un focus particulier sur les **bits spéciaux SUID et SGID**. Ces concepts sont essentiels pour comprendre comment sécuriser (ou compromettre 😈) un système Linux.
+This project explores in depth the permission mechanisms in Linux, with a particular focus on **SUID and SGID special bits**. These concepts are essential to understand how to secure (or compromise 😈) a Linux system.
 
-### 🎯 Ce que vous allez apprendre :
+### 🎯 What you will learn:
 
-- 👥 Gestion avancée des utilisateurs et groupes
-- 📂 Permissions de fichiers (read, write, execute)
-- ⭐ Bits spéciaux : SUID, SGID et Sticky bit
-- 🔑 Configuration sudo sans mot de passe
-- 🔍 Recherche de vulnérabilités de permissions
-- 🛠️ Manipulation avancée avec `find` et `chmod`
+- 👥 Advanced user and group management
+- 📂 File permissions (read, write, execute)
+- ⭐ Special bits: SUID, SGID and Sticky bit
+- � Sudo configuration without password
+- 🔍 Searching for permission vulnerabilities
+- 🛠️ Advanced manipulation with `find` and `chmod`
+
+---
+
+## � Table of Contents
+
+- [Task 0: Create a user](#task-0--create-a-user)
+- [Task 1: Create a group](#task-1--create-a-group)
+- [Task 2: Sudo without password](#task-2--sudo-without-password)
+- [Task 3: SUID hunting](#task-3--suid-hunting)
+- [Task 4: List SUID files](#task-4--list-suid-files)
+- [Task 5: List SGID files](#task-5--list-sgid-files)
+- [Task 6: Modified files with SUID/SGID](#task-6--modified-files-with-suidsgid)
+- [Task 7: Read-only for others](#task-7--read-only-for-others)
+- [Task 8: Change owner](#task-8--change-owner)
+- [Task 9: Full permissions for empty files](#task-9--full-permissions-for-empty-files)
+- [Permissions recap](#linux-permissions-recap)
+
+---
+
+## 🔧 Task 0 : Create a user
+
+> **Who can add a new user in Linux!**
+
+### 📁 File: `0-add_user.sh`
+
+Script that creates a new user and sets their password.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+useradd -m $1
+echo "$1:$2" | chpasswd
+```
+
+#### 📝 Arguments:
+- `$1`: Username
+- `$2`: Password
+
+#### � Explanation:
+| Command | Description |
+|----------|-------------|
+| `useradd -m $1` | Creates a user with a home directory (`-m`) |
+| `echo "$1:$2" \| chpasswd` | Sets the password via pipe |
+
+#### 🚀 Usage:
+```bash
+sudo ./0-add_user.sh holberton H@ck$@f3Gu@rD!
+```
+
+#### ✅ Verification:
+```bash
+tail -1 /etc/passwd
+# holberton:x:1005:1005::/home/holberton:/bin/sh
+```
+
+---
+
+## 👥 Task 1 : Create a group
+
+> **Can we trust Groups?**
+
+### 📁 File: `1-add_group.sh`
+
+Script that creates a new group, changes the group owner of a file and sets permissions.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+addgroup $1
+chown :$1 $2
+chmod g+rx $2
+```
+
+#### 📝 Arguments:
+- `$1`: Group name
+- `$2`: Target file
+
+#### 🔍 Explanation:
+| Command | Description |
+|----------|-------------|
+| `addgroup $1` | Creates a new group |
+| `chown :$1 $2` | Changes group owner (`:` = group only) |
+| `chmod g+rx $2` | Adds read + execute for group |
+
+#### 🚀 Usage:
+```bash
+sudo ./1-add_group.sh security example.txt
+```
+
+#### 📊 Result:
+```
+-rw-rwxr-- 1 maroua security 0 Nov 8 12:03 example.txt
+```
+
+---
+
+## 🔓 Task 2 : Sudo without password
+
+> **Let's Add some fun!**
+
+### 📁 File: `2-sudo_nopass.sh`
+
+Script that allows a user to execute sudo without password.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+echo "$1 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+```
+
+#### 📝 Arguments:
+- `$1`: Username
+
+#### ⚠️ **Warning:**
+> In production, always use `visudo` to edit `/etc/sudoers` safely!
+
+#### 🚀 Usage:
+```bash
+sudo ./2-sudo_nopass.sh maroua
+```
+
+#### ✅ Result:
+The user can now execute any sudo command without entering a password! 🎉
+
+---
+
+## 🔍 Task 3 : SUID hunting
+
+> **SUID hunting, Known Exploits!**
+
+### 📁 File: `3-find_files.sh`
+
+Script that searches for SUID vulnerabilities in a directory.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find $1 -perm -4000 -exec ls -l {} \; 2> /dev/null
+```
+
+#### 📝 Arguments:
+- `$1`: Target directory
+
+#### 🔍 Explanation:
+- `-perm -4000`: Searches for the SUID bit (4000 in octal)
+- `-exec ls -l {} \;`: Displays details of each file
+- `2> /dev/null`: Hides errors
+
+#### 💡 What is SUID?
+> The **SUID** (Set User ID) bit allows a file to be executed with the privileges of the file's **owner**. This is a prime target for attackers! 🎯
+
+#### 🚀 Usage:
+```bash
+sudo ./3-find_files.sh /usr/bin
+```
+
+---
+
+## 🎯 Task 4 : List SUID files
+
+> **Handle the SUID bit like a hot potato!**
+
+### 📁 File: `4-find_suid.sh`
+
+Script that lists all files with SUID in a directory.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find $1 -perm -4000 -type f -ls 2> /dev/null
+```
+
+#### 📝 Arguments:
+- `$1`: Directory
+
+#### 🔍 Explanation:
+- `-type f`: Only files (not directories)
+- `-ls`: Displays complete details
+
+#### 🚀 Usage:
+```bash
+sudo ./4-find_suid.sh Security
+```
+
+---
+
+## 👫 Task 5 : List SGID files
+
+> **Group hug your files with Setgid!**
+
+### 📁 File: `5-find_sgid.sh`
+
+Script that lists all files with SGID in a directory.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find $1 -perm -2000 -type f -ls 2> /dev/null
+```
+
+#### 📝 Arguments:
+- `$1`: Directory
+
+#### 💡 What is SGID?
+> The **SGID** (Set Group ID) bit works like SUID but for **groups**. On a directory, it forces new files to inherit the directory's group! 🤝
+
+#### 🚀 Usage:
+```bash
+sudo ./5-find_sgid.sh Security
+```
+
+---
+
+## ⏰ Task 6 : Modified files with SUID/SGID
+
+> **Finding files with setuid or setgid!**
+
+### 📁 File: `6-check_files.sh`
+
+Script that finds files modified in the last 24h with SUID or SGID.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find $1 \(-type f -perm /2000 -o -perm /4000 \) -mtime -1 exec ls -l {} \; 2> /dev/null
+```
+
+#### 📝 Arguments:
+- `$1`: Directory
+
+#### 🔍 Explanation:
+- `\( ... \)`: Groups conditions
+- `-perm /2000 -o -perm /4000`: SGID **OR** SUID
+- `-mtime -1`: Modified in the last 24 hours
+- `-o`: OR operator
+
+#### 🚀 Usage:
+```bash
+sudo ./6-check_files.sh Security
+```
+
+---
+
+## 📖 Task 7 : Read-only for others
+
+> **Others can read the files, but no writing privileges allowed!**
+
+### 📁 File: `7-file_read.sh`
+
+Script that sets all files to read-only for "others".
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find $1 -type f -exec -chmod o=r {} \; 2>/dev/null
+```
+
+#### 📝 Arguments:
+- `$1`: Directory
+
+#### 🔍 Explanation:
+- `chmod o=r`: Sets "others" to **read-only** (r--)
+- The `=` **replaces** all existing permissions
+
+#### � Transformation:
+```diff
+- -rwxrwxr-x  (others = r-x)
++ -rwxrwxr--  (others = r--)
+```
+
+#### 🚀 Usage:
+```bash
+sudo ./7-file_read.sh Security/
+```
+
+---
+
+## 🔄 Task 8 : Change owner
+
+> **Changing file owners, one friendship at a time!**
+
+### 📁 File: `8-change_user.sh`
+
+Script that changes the owner from user2 to user3.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find "$1" -type f -user user2 -exec chown user3 {} \;
+```
+
+#### 📝 Arguments:
+- `$1`: Directory
+
+#### 🔍 Explanation:
+- `-user user2`: Filters only user2's files
+- `chown user3`: Changes owner to user3
+- `"$1"`: Quotes protect against spaces
+
+#### 📊 Transformation:
+```diff
+- -rwxrwxr-- 1 user2 maroua  33 Dec 19 11:00 file.sh
++ -rwxrwxr-- 1 user3 maroua  33 Dec 19 11:00 file.sh
+```
+
+#### 🚀 Usage:
+```bash
+sudo ./8-change_user.sh Security/
+```
+
+---
+
+## 🎉 Task 9 : Full permissions for empty files
+
+> **Empty files got a promotion!**
+
+### 📁 File: `9-empty_file.sh`
+
+Script that gives full permissions to empty files.
+
+#### 💻 Code:
+```bash
+#!/bin/bash
+find $1 -type f -empty -exec chmod 777 {} \;
+```
+
+#### 📝 Arguments:
+- `$1`: Directory
+
+#### 🔍 Explanation:
+- `-empty`: Finds empty files (size 0)
+- `chmod 777`: Full permissions (rwxrwxrwx)
+  - **7** = 4(read) + 2(write) + 1(execute)
+
+#### 📊 Transformation:
+```diff
+- -rw-r--r-- 1 maroua maroua 0 Jan 3 14:16 flag.txt
++ -rwxrwxrwx 1 maroua maroua 0 Jan 3 14:16 flag.txt
+```
+
+#### 🚀 Usage:
+```bash
+sudo ./9-empty_file.sh Security/
+```
+
+---
+
+## � Linux Permissions Recap
+
+### 🎨 Permission format
+
+```
+-rwxrwxrwx
+│││││││││└─ 🌍 other: execute
+││││││││└── 🌍 other: write
+│││││││└─── 🌍 other: read
+││││││└──── 👥 group: execute
+│││││└───── 👥 group: write
+││││└────── 👥 group: read
+│││└─────── 👤 owner: execute
+││└──────── 👤 owner: write
+│└───────── 👤 owner: read
+└────────── 📄 type (- = file, d = directory)
+```
+
+### 🔢 Octal values
+
+| Octal | Binary | Permissions | Meaning |
+|-------|---------|-------------|---------------|
+| **0** | 000 | `---` | No permissions |
+| **1** | 001 | `--x` | Execute only |
+| **2** | 010 | `-w-` | Write only |
+| **3** | 011 | `-wx` | Write + Execute |
+| **4** | 100 | `r--` | Read only |
+| **5** | 101 | `r-x` | Read + Execute |
+| **6** | 110 | `rw-` | Read + Write |
+| **7** | 111 | `rwx` | All permissions |
+
+### ⭐ Special bits
+
+| Bit | Value | Name | Effect |
+|-----|--------|-----|-------|
+| 🔴 | 4000 | **SUID** | Execute with owner's privileges |
+| 🔵 | 2000 | **SGID** | Execute with group's privileges |
+| 🟡 | 1000 | **Sticky** | Only owner can delete (directories) |
+
+### �️ Essential commands
+
+| Command | Usage | Example |
+|----------|-------|---------|
+| `chmod` | Change permissions | `chmod 755 script.sh` |
+| `chown` | Change owner | `chown user:group file.txt` |
+| `chgrp` | Change group | `chgrp developers project/` |
+| `find` | Search for files | `find / -perm -4000` |
+| `useradd` | Create a user | `useradd -m john` |
+| `addgroup` | Create a group | `addgroup developers` |
+
+### 💡 Practical examples
+
+#### Make a script executable:
+```bash
+chmod +x script.sh
+# or
+chmod 755 script.sh
+```
+
+#### Protect a sensitive file:
+```bash
+chmod 600 secret.txt  # Only owner can read/write
+```
+
+#### Create a shared directory:
+```bash
+mkdir shared
+chmod 770 shared      # Owner and Group: rwx, Others: ---
+chgrp developers shared
+```
+
+#### Find all SUID files on the system:
+```bash
+find / -perm -4000 -type f 2>/dev/null
+```
+
+---
+
+## 🎓 Key Points to Remember
+
+<div align="center">
+
+| Concept | � Important Point |
+|---------|-------------------|
+| **SUID** | Allows executing a program with the owner's rights |
+| **SGID** | Allows executing a program with the group's rights |
+| **Sticky Bit** | Protects files in a shared directory |
+| **chmod** | Modifies permissions (symbolic or octal) |
+| **chown** | Changes owner and/or group |
+| **find** | Powerful tool to search and act on files |
+
+</div>
+
+---
+
+## 🏆 Author
+
+<div align="center">
+
+**Pmichel74** 🚀
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Pmichel74)
+
+📦 **Repository:** holbertonschool-cyber_security  
+📂 **Project:** linux_security/0x01_permissions_sguid_sgid
+
+</div>
+
+---
+
+## 📖 Resources
+
+- 📘 [Linux File Permissions - Linux.com](https://www.linux.com/training-tutorials/understanding-linux-file-permissions/)
+- 🔐 [SUID, SGID and Sticky Bit - Red Hat](https://www.redhat.com/sysadmin/suid-sgid-sticky-bit)
+- � [Find Command in Linux - GeeksforGeeks](https://www.geeksforgeeks.org/find-command-in-linux-with-examples/)
+- 📚 [Linux Privilege Escalation - HackTricks](https://book.hacktricks.xyz/linux-hardening/privilege-escalation)
+- 🛡️ [Linux Security - ArchWiki](https://wiki.archlinux.org/title/Security)
+
+---
+
+<div align="center">
+
+**✨ Good luck with your cybersecurity explorations! ✨**
+
+🔒 *"With great permissions comes great responsibility"* 🔒
+
+</div>
 
 ---
 
