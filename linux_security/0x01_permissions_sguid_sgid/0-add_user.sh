@@ -1,3 +1,3 @@
 #!/bin/bash
-adduser $1
+useradd -m -s /bin/bash "$1"
 echo "$1:$2" | chpasswd
