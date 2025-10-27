@@ -1,1 +1,1 @@
-iptables -L -n -v
+iptables -L -n -v --line-numbers
