@@ -1,2 +1,2 @@
 #!/bin/bash
-grep -v "^$|^[[:space:]]*#" /etc/ssh/sshd_config
+grep -vE "^$|^[[:space:]]*#" /etc/ssh/sshd_config
