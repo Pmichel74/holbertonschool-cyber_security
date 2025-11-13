@@ -204,11 +204,9 @@ You'll discover, exploit, and document critical vulnerabilities that affect mill
 1. Log in with provided credentials
 2. Open DevTools (F12) → Network tab (enable "Preserve log")
 3. Explore the application and observe API calls
-4. Find endpoints exposing User IDs:
-   - `/api/customer/info/me` → Your own ID
-   - `/api/customer/contacts` → Everyone's IDs! 🚨
-5. Test IDOR: Access `/api/customer/info/{another_user_id}`
-6. Capture the flag from victim's profile
+4. Identify endpoints that expose or reference user identifiers
+5. Test for IDOR vulnerabilities by manipulating parameters
+6. Document your findings and capture the flag
 
 </td>
 <td width="30%">
@@ -241,7 +239,7 @@ You'll discover, exploit, and document critical vulnerabilities that affect mill
 <details>
 <summary>💡 Hint: Where to look?</summary>
 
-Look for API endpoints that return user lists or accept user IDs as parameters. The browser's Network tab is your best friend!
+Pay attention to API requests in the Network tab. Look for patterns in how the application identifies and references users. Consider both GET and POST requests.
 
 </details>
 
@@ -256,14 +254,12 @@ Look for API endpoints that return user lists or accept user IDs as parameters. 
 **🎯 Mission:** Use discovered User IDs to access bank account balances
 
 **🔑 Key Steps:**
-1. Use User IDs from Task 0
-2. Explore financial endpoints:
-   - `/api/customer/transactions` → Exposes `account_id` 🚨
-   - `/api/customer/info/{user_id}` → Contains `accounts_id[]`
-3. Find vulnerable endpoint: `/api/accounts/info/{account_id}`
-4. Test IDOR by swapping account IDs
-5. Access other users' balances and account details
-6. Locate the flag in a target account
+1. Use information discovered from Task 0
+2. Explore financial-related endpoints and transactions
+3. Identify how the application references bank accounts
+4. Look for patterns where account identifiers are exposed
+5. Test for IDOR vulnerabilities on account-related endpoints
+6. Locate the flag in your target's account information
 
 </td>
 <td width="30%">
@@ -297,7 +293,7 @@ Look for API endpoints that return user lists or accept user IDs as parameters. 
 <details>
 <summary>💡 Hint: Transaction history is gold</summary>
 
-Transaction logs often reveal account IDs of both sender and receiver. Check the `receiver_payment_id` fields!
+Transaction logs can reveal valuable information about accounts and their identifiers. Examine all fields in transaction data carefully.
 
 </details>
 
@@ -314,14 +310,14 @@ Transaction logs often reveal account IDs of both sender and receiver. Check the
 **🔥 Advanced Technique:** Burp Suite Intruder automation
 
 **🔑 Key Steps:**
-1. Analyze transfer endpoint: `/api/accounts/transfer_to/{destination}`
-2. Identify required parameters: `account_id`, `routing`, `number`, `amount`
+1. Analyze how the wire transfer functionality works
+2. Identify what parameters are required for transfers
 3. **Phase 1 - Reconnaissance:**
-   - Use Intruder to gather credentials from 20 accounts
-   - Endpoint: `/api/accounts/info/{account_id}`
+   - Gather necessary information about multiple accounts
+   - Use automation tools efficiently
 4. **Phase 2 - Exploitation:**
-   - Configure Pitchfork attack with 4 payload sets
-   - Transfer funds from all 20 accounts to yours
+   - Configure Burp Intruder with appropriate attack type
+   - Automate the exploitation process
 5. Reach $10,000 balance → Unlock flag_2! 🎉
 
 </td>
@@ -355,15 +351,13 @@ Transaction logs often reveal account IDs of both sender and receiver. Check the
 <details>
 <summary>🛠️ Burp Intruder Configuration Tip</summary>
 
-**Attack Type:** Pitchfork (synchronizes multiple payload sets)
+**Attack Type:** Choose the attack type that allows synchronization of multiple payload sets
 
-**Payloads needed:**
-1. Amount (balance - 1)
-2. Account ID
-3. Routing number
-4. Account number
-
-Set delay to 500ms to avoid rate limiting!
+**Important considerations:**
+- Identify all required parameters for transfers
+- Gather the necessary data before automation
+- Set appropriate delays to avoid detection
+- Monitor responses for success indicators
 
 </details>
 
@@ -380,15 +374,13 @@ Set delay to 500ms to avoid rate limiting!
 **💀 Attack Chain:** 5-step IDOR exploitation
 
 **🔑 Key Steps:**
-1. **Step 1:** Get victim's `card_id` from `/api/customer/transactions`
-2. **Step 2:** Steal card details via `/api/cards/info/{card_id}`
-   - Number, CVV, expiration date 🔓
-3. **Step 3:** Initialize payment with stolen card: `/api/cards/init_payment`
-4. **Step 4:** 🚨 **CRITICAL EXPLOIT** → Get victim's OTP!
-   - `/api/cards/3dsecure/{card_id}` exposes the OTP
-5. **Step 5:** Confirm payment: `/api/cards/confirm_payment/{payment_id}`
-   - Use stolen card number + OTP
-6. Payment successful → Flag_3 captured! 🎯
+1. **Step 1:** Identify how card IDs are exposed in the application
+2. **Step 2:** Test access to card information endpoints
+3. **Step 3:** Understand the payment initialization process
+4. **Step 4:** 🚨 **CRITICAL** → Investigate the 3D Secure workflow
+5. **Step 5:** Analyze the payment confirmation mechanism
+6. Chain the vulnerabilities to complete an unauthorized payment
+7. Payment successful → Flag_3 captured! 🎯
 
 </td>
 <td width="30%">
@@ -422,14 +414,15 @@ Set delay to 500ms to avoid rate limiting!
 </table>
 
 <details>
-<summary>🎯 Pro Tip: Use 3 Repeater tabs</summary>
+<summary>🎯 Pro Tip: Organize your workflow</summary>
 
-Open 3 tabs in Burp Repeater for the attack chain:
-- Tab 1: Init payment
-- Tab 2: Get OTP
-- Tab 3: Confirm payment
+This task requires orchestrating multiple requests in sequence. Use Burp Suite Repeater to:
+- Test each step individually
+- Understand the complete payment flow
+- Identify where IDOR vulnerabilities exist
+- Chain the exploits in the correct order
 
-Execute them in sequence!
+Think about the entire payment lifecycle!
 
 </details>
 
@@ -569,13 +562,13 @@ sudo apt install curl jq
 ```bash
 # Test an endpoint with cURL
 curl -H "Cookie: session=YOUR_SESSION" \
-     http://web0x06.hbtn/api/customer/info/me | jq .
+     http://web0x06.hbtn/api/endpoint | jq .
 
 # Pretty-print JSON response
-curl -s http://web0x06.hbtn/api/customer/transactions | jq '.[]'
+curl -s http://web0x06.hbtn/api/endpoint | jq '.'
 
-# Extract specific fields
-curl -s http://web0x06.hbtn/api/customer/transactions | jq '.[].account_id'
+# Extract specific fields (example)
+curl -s http://web0x06.hbtn/api/endpoint | jq '.[] | .fieldname'
 ```
 
 ---
@@ -612,11 +605,11 @@ curl -s http://web0x06.hbtn/api/customer/transactions | jq '.[].account_id'
 
 **Example Attack:**
 ```http
-GET /api/customer/info/123  ← Attacker changes ID
-Host: vulnerable-bank.com
+GET /api/resource/123  ← Attacker manipulates ID parameter
+Host: vulnerable-app.com
 Cookie: session=attacker_session
 
-→ Returns victim's data! 🚨
+→ Without proper authorization checks, returns unauthorized data! 🚨
 ```
 
 **Real-world cases:**
