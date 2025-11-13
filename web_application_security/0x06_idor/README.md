@@ -1,305 +1,580 @@
 # 0x06. IDOR - Insecure Direct Object References 🏦
 
-![Cybersecurity](https://img.shields.io/badge/Cybersecurity-Web%20Application%20Security-red)
-![IDOR](https://img.shields.io/badge/Vulnerability-IDOR-orange)
-![Burp Suite](https://img.shields.io/badge/Tool-Burp%20Suite-blue)
+<div align="center">
 
-## 📋 Table of Contents
+![Cybersecurity](https://img.shields.io/badge/Cybersecurity-Web%20Application%20Security-red?style=for-the-badge&logo=security)
+![IDOR](https://img.shields.io/badge/Vulnerability-IDOR-orange?style=for-the-badge&logo=hack-the-box)
+![Burp Suite](https://img.shields.io/badge/Tool-Burp%20Suite-blue?style=for-the-badge&logo=burp-suite)
+![Score](https://img.shields.io/badge/Score-100%25-success?style=for-the-badge&logo=target)
 
-- [Description](#description)
-- [Learning Objectives](#learning-objectives)
-- [Context: CyberBank](#context-cyberbank)
-- [Resources](#resources)
-- [Requirements](#requirements)
-- [Tasks](#tasks)
-  - [Task 0: Uncovering User IDs](#task-0-uncovering-user-ids)
-  - [Task 1: Enumerating Account Numbers](#task-1-enumerating-account-numbers)
-  - [Task 2: Wire Transfer Exploitation](#task-2-wire-transfer-exploitation)
-  - [Task 3: Bypassing 3D Secure](#task-3-bypassing-3d-secure)
-  - [Task 4: Vulnerability Report](#task-4-vulnerability-report)
-- [Tools Used](#tools-used)
-- [Project Structure](#project-structure)
-- [Author](#author)
+### 🔓 Break into CyberBank & Master IDOR Vulnerabilities 🔓
+
+*A hands-on journey through Insecure Direct Object References in a realistic banking simulation*
+
+[📖 Overview](#-overview) • [🎯 Objectives](#-learning-objectives) • [🏦 CyberBank](#-cyberbank-simulation) • [📝 Tasks](#-project-tasks) • [🛠️ Tools](#%EF%B8%8F-tools--setup) • [🚀 Resources](#-additional-resources)
 
 ---
 
-## 📖 Description
+</div>
 
-This project explores **IDOR (Insecure Direct Object References)** vulnerabilities in a simulated banking environment called **CyberBank**. Through a series of progressive challenges, you will learn to identify, exploit, and document critical security flaws affecting resource access and financial transactions.
+## 🌟 Overview
 
-### What is an IDOR?
+Welcome to the **IDOR Challenge**! This project takes you deep into the world of web application security through a simulated banking environment called **CyberBank**. 
 
-An IDOR vulnerability occurs when an application exposes a direct reference to an internal object (user ID, account number, etc.) without verifying that the authenticated user has the right to access that resource. This allows an attacker to manipulate these references to access data or perform unauthorized actions.
+You'll discover, exploit, and document critical vulnerabilities that affect millions of real-world applications. By the end, you'll understand how attackers breach systems and how developers can protect them.
 
-**Example:**
+### 💡 What is an IDOR?
+
+**IDOR (Insecure Direct Object Reference)** occurs when an application exposes direct references to internal objects without proper authorization checks.
+
+```diff
+- ❌ Vulnerable:  GET /api/customer/info/12345
++ ✅ Secure:      Verify user owns resource before access
 ```
-❌ Vulnerable: GET /api/customer/info/12345
-✅ Secure:     Verify that logged-in user = owner of ID 12345
-```
+
+**Real-world Impact:**
+- 💸 Financial theft (unauthorized transfers)
+- 🔓 Data breaches (access to private information)
+- 🎭 Identity theft (impersonation attacks)
+- 🏛️ Regulatory violations (GDPR, PCI DSS)
 
 ---
 
 ## 🎯 Learning Objectives
 
-By the end of this project, you will be able to:
+<table>
+<tr>
+<td width="50%">
 
-- ✅ Identify and understand IDOR vulnerabilities
-- ✅ Use Burp Suite to intercept and manipulate HTTP requests
-- ✅ Enumerate resources (user IDs, account numbers, card IDs)
-- ✅ Exploit authorization flaws to access sensitive data
-- ✅ Manipulate financial transactions in an unauthorized manner
-- ✅ Bypass security mechanisms (3D Secure)
-- ✅ Write a professional vulnerability report
-- ✅ Understand the impact of IDOR on real systems
+### 🔍 Technical Skills
+- ✅ Identify IDOR vulnerabilities in web applications
+- ✅ Master **Burp Suite** (Proxy, Repeater, Intruder)
+- ✅ Intercept and manipulate HTTP/S traffic
+- ✅ Enumerate resources systematically
+- ✅ Chain multiple vulnerabilities for impact
+
+</td>
+<td width="50%">
+
+### 🛡️ Security Expertise
+- ✅ Understand **Broken Access Control** (OWASP #1)
+- ✅ Exploit business logic flaws
+- ✅ Bypass authentication mechanisms
+- ✅ Document findings professionally
+- ✅ Think like both attacker & defender
+
+</td>
+</tr>
+</table>
 
 ---
 
-## 🏦 Context: CyberBank
+## 🏦 CyberBank Simulation
 
-**CyberBank** is a simulated web banking application designed for web security learning. It intentionally presents critical IDOR vulnerabilities affecting:
+<div align="center">
 
-- 👤 User profiles
-- 💰 Bank accounts
-- 💸 Money transfers
-- 💳 Card payments
+```ascii
+╔══════════════════════════════════════════════════════════╗
+║                    🏦 CYBERBANK 🏦                       ║
+║              Your Target Banking Application             ║
+╠══════════════════════════════════════════════════════════╣
+║  🌐 URL: http://web0x06.hbtn                            ║
+║  🎯 Mission: Find & exploit IDOR vulnerabilities        ║
+║  🚩 Goal: Capture all flags & write security report     ║
+╚══════════════════════════════════════════════════════════╝
+```
 
-**Application URL:** `http://web0x06.hbtn`
+</div>
 
-⚠️ **Warning:** This application is a learning environment. Never apply these techniques on real systems without explicit authorization.
+### 🔴 Vulnerable Areas
+
+| Component | Vulnerability | Impact |
+|-----------|--------------|--------|
+| 👤 **User Profiles** | No ownership validation | Access any user's data |
+| 💰 **Bank Accounts** | Direct account_id exposure | View all balances |
+| 💸 **Wire Transfers** | Missing authorization | Steal money from anyone |
+| 💳 **Card Payments** | 3D Secure bypass | Fraudulent transactions |
+
+⚠️ **Disclaimer:** This is a **legal, authorized learning environment**. Never test these techniques on real systems without written permission!
 
 ---
 
-## 📚 Resources
+## 📚 Essential Resources
 
-### Official Documentation
+<details>
+<summary>🔗 Click to expand resources</summary>
+
+### 📖 Official Documentation
 - [OWASP Top 10 - A01:2021 Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/)
-- [PortSwigger - IDOR](https://portswigger.net/web-security/access-control/idor)
-- [OWASP Testing Guide - IDOR](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References)
+- [PortSwigger Web Security Academy - IDOR](https://portswigger.net/web-security/access-control/idor)
+- [OWASP Testing Guide - IDOR Testing](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References)
 
-### Tools
-- [Burp Suite Community](https://portswigger.net/burp/communitydownload)
-- [Browser Developer Tools (F12)](https://developer.chrome.com/docs/devtools/)
+### 🛠️ Tools
+- [Burp Suite Community (FREE)](https://portswigger.net/burp/communitydownload) - Essential HTTP proxy
+- [Browser DevTools](https://developer.chrome.com/docs/devtools/) - Built-in network analysis
 
-### Articles & Tutorials
-- [HackerOne IDOR Reports](https://www.hackerone.com/vulnerability-management/what-insecure-direct-object-reference-idor)
-- [PentesterLab - IDOR Exercises](https://pentesterlab.com/)
+### 📺 Video Tutorials
+- [PortSwigger Academy - Free Labs](https://portswigger.net/web-security/all-labs)
+- [HackerOne IDOR Case Studies](https://www.hackerone.com/vulnerability-management/what-insecure-direct-object-reference-idor)
+
+</details>
 
 ---
 
-## 🔧 Requirements
+## 🔧 Requirements & Setup
 
-### Required Knowledge
-- Basic understanding of HTTP protocol (GET, POST, headers, cookies)
-- Knowledge of REST APIs
-- Familiarity with JSON format
-- Basic terminal/command line usage
+### ✅ Prerequisites
 
-### Software
-- **Web browser** (Firefox, Chrome) with DevTools
-- **Burp Suite Community Edition** (free)
-- **cURL** (optional, for command-line testing)
-- **jq** (optional, for JSON parsing)
+<table>
+<tr>
+<td width="50%">
 
-### Burp Suite Setup
-```bash
-# 1. Download Burp Suite Community
-# 2. Configure browser proxy: 127.0.0.1:8080
-# 3. Enable interception: Proxy → Intercept → Intercept is on
+**💡 Knowledge**
+```
+✓ HTTP protocol basics
+✓ REST API concepts
+✓ JSON format
+✓ Terminal commands
 ```
 
+</td>
+<td width="50%">
+
+**💻 Software**
+```
+✓ Web Browser (Firefox/Chrome)
+✓ Burp Suite Community
+✓ cURL (optional)
+✓ jq (optional)
+```
+
+</td>
+</tr>
+</table>
+
+### ⚙️ Burp Suite Configuration
+
+```bash
+# Quick Setup Guide
+1. Download Burp Suite Community Edition
+2. Configure browser proxy: 127.0.0.1:8080
+3. Start Burp Suite
+4. Enable interception: Proxy → Intercept is on
+5. Browse to http://web0x06.hbtn
+```
+
+<details>
+<summary>🔍 Detailed Firefox/Chrome proxy setup</summary>
+
+**Firefox:**
+1. Settings → Network Settings → Manual proxy configuration
+2. HTTP Proxy: `127.0.0.1`, Port: `8080`
+3. Check "Use this proxy for all protocols"
+
+**Chrome:**
+1. Install FoxyProxy extension
+2. Add proxy: `127.0.0.1:8080`
+3. Toggle proxy on when testing
+
+</details>
+
 ---
 
-## 📝 Tasks
+## 📝 Project Tasks
 
-### Task 0: Uncovering User IDs
-**Score:** 100% ✅
+<div align="center">
 
-#### Objective
-Discover User IDs in the CyberBank application by exploring features and identifying how identifiers are exposed.
+### 🎮 Your Mission: Complete 4 Progressive Challenges
 
-#### Instructions
-1. Log in to `http://web0x06.hbtn/dashboard` with the provided credentials
-2. Open DevTools (F12) → Network tab (with "Preserve log" enabled)
-3. Explore the application and observe API requests
-4. Identify endpoints exposing User IDs:
+</div>
+
+---
+
+### 🔍 Task 0: Uncovering User IDs
+
+<table>
+<tr>
+<td width="70%">
+
+**🎯 Mission:** Discover how CyberBank exposes user identifiers
+
+**📍 Starting Point:** `http://web0x06.hbtn/dashboard`
+
+**🔑 Key Steps:**
+1. Log in with provided credentials
+2. Open DevTools (F12) → Network tab (enable "Preserve log")
+3. Explore the application and observe API calls
+4. Find endpoints exposing User IDs:
    - `/api/customer/info/me` → Your own ID
-   - `/api/customer/contacts` → List of all users
-5. Test IDOR access on `/api/customer/info/{user_id}`
-6. Retrieve the flag from another user's information
+   - `/api/customer/contacts` → Everyone's IDs! 🚨
+5. Test IDOR: Access `/api/customer/info/{another_user_id}`
+6. Capture the flag from victim's profile
 
-#### Key Concepts
-- User enumeration
-- Information disclosure via public endpoints
-- URL parameter manipulation
+</td>
+<td width="30%">
 
-#### Output File
+```ascii
+┌─────────────┐
+│ Difficulty  │
+├─────────────┤
+│ ⭐ Easy     │
+└─────────────┘
+
+┌─────────────┐
+│   Concepts  │
+├─────────────┤
+│ • Enumeration│
+│ • Info leak │
+│ • IDOR basics│
+└─────────────┘
 ```
-0-flag.txt
-```
+
+**📁 Output:**
+`0-flag.txt`
+
+**✅ Score:** 100%
+
+</td>
+</tr>
+</table>
+
+<details>
+<summary>💡 Hint: Where to look?</summary>
+
+Look for API endpoints that return user lists or accept user IDs as parameters. The browser's Network tab is your best friend!
+
+</details>
 
 ---
 
-### Task 1: Enumerating Account Numbers for Balance Disclosure
-**Score:** 100% ✅
+### 💰 Task 1: Enumerating Account Numbers
 
-#### Objective
-Use discovered User IDs to enumerate bank account numbers and access balances in an unauthorized manner.
+<table>
+<tr>
+<td width="70%">
 
-#### Instructions
+**🎯 Mission:** Use discovered User IDs to access bank account balances
+
+**🔑 Key Steps:**
 1. Use User IDs from Task 0
-2. Explore account-related endpoints:
-   - `/api/customer/transactions` → Reveals `account_id`
+2. Explore financial endpoints:
+   - `/api/customer/transactions` → Exposes `account_id` 🚨
    - `/api/customer/info/{user_id}` → Contains `accounts_id[]`
-3. Identify the vulnerable endpoint: `/api/accounts/info/{account_id}`
-4. Test IDOR access by changing the `account_id`
-5. Access balances and account information of other users
-6. Find the flag in a specific account
+3. Find vulnerable endpoint: `/api/accounts/info/{account_id}`
+4. Test IDOR by swapping account IDs
+5. Access other users' balances and account details
+6. Locate the flag in a target account
 
-#### Key Concepts
-- Horizontal resource enumeration
-- Unauthorized access to financial data
-- Sensitive information disclosure
+</td>
+<td width="30%">
 
-#### Output File
+```ascii
+┌─────────────┐
+│ Difficulty  │
+├─────────────┤
+│ ⭐⭐ Medium │
+└─────────────┘
+
+┌─────────────┐
+│   Concepts  │
+├─────────────┤
+│ • Horizontal│
+│   escalation│
+│ • Financial │
+│   data leak │
+└─────────────┘
 ```
-1-flag.txt
-```
+
+**📁 Output:**
+`1-flag.txt`
+
+**✅ Score:** 100%
+
+</td>
+</tr>
+</table>
+
+<details>
+<summary>💡 Hint: Transaction history is gold</summary>
+
+Transaction logs often reveal account IDs of both sender and receiver. Check the `receiver_payment_id` fields!
+
+</details>
 
 ---
 
-### Task 2: Manipulating Wire Transfers to Inflate Account Balance
-**Score:** 100% ✅
+### 💸 Task 2: Wire Transfer Exploitation
 
-#### Objective
-Exploit the wire transfer functionality to increase your balance beyond $10,000 and obtain flag_2.
+<table>
+<tr>
+<td width="70%">
 
-#### Instructions
-1. Analyze the transfer functionality on `/api/accounts/transfer_to/{destination_id}`
-2. Identify required parameters (account_id, routing, number, amount)
-3. Use Burp Suite Intruder to automate exploitation:
-   - **Phase 1:** Retrieve credentials for 20 accounts via `/api/accounts/info/{account_id}`
-   - **Phase 2:** Configure a Pitchfork attack with 4 payloads
-4. Transfer funds from all accounts to your account
-5. Reach a balance > $10,000 to unlock flag_2
+**🎯 Mission:** Steal money from 20 accounts to reach $10,000+ balance
 
-#### Key Concepts
-- IDOR on critical actions (money transfers)
-- Attack automation with Burp Intruder
-- Lack of ownership validation
+**🔥 Advanced Technique:** Burp Suite Intruder automation
 
-#### Tools
-- Burp Suite Intruder (Attack type: Pitchfork)
-- Repeater for manual testing
+**🔑 Key Steps:**
+1. Analyze transfer endpoint: `/api/accounts/transfer_to/{destination}`
+2. Identify required parameters: `account_id`, `routing`, `number`, `amount`
+3. **Phase 1 - Reconnaissance:**
+   - Use Intruder to gather credentials from 20 accounts
+   - Endpoint: `/api/accounts/info/{account_id}`
+4. **Phase 2 - Exploitation:**
+   - Configure Pitchfork attack with 4 payload sets
+   - Transfer funds from all 20 accounts to yours
+5. Reach $10,000 balance → Unlock flag_2! 🎉
 
-#### Output File
+</td>
+<td width="30%">
+
+```ascii
+┌─────────────┐
+│ Difficulty  │
+├─────────────┤
+│ ⭐⭐⭐ Hard │
+└─────────────┘
+
+┌─────────────┐
+│   Tools     │
+├─────────────┤
+│ • Burp Proxy│
+│ • Intruder  │
+│ • Repeater  │
+└─────────────┘
 ```
-2-flag.txt
-```
+
+**📁 Output:**
+`2-flag.txt`
+
+**✅ Score:** 100%
+
+</td>
+</tr>
+</table>
+
+<details>
+<summary>🛠️ Burp Intruder Configuration Tip</summary>
+
+**Attack Type:** Pitchfork (synchronizes multiple payload sets)
+
+**Payloads needed:**
+1. Amount (balance - 1)
+2. Account ID
+3. Routing number
+4. Account number
+
+Set delay to 500ms to avoid rate limiting!
+
+</details>
 
 ---
 
-### Task 3: Bypassing 3D Secure Verification for Unauthorized Payment
-**Score:** 100% ✅
+### 💳 Task 3: Bypassing 3D Secure for Fraudulent Payments
 
-#### Objective
-Perform a fraudulent payment using another user's card information and bypassing 3D Secure authentication.
+<table>
+<tr>
+<td width="70%">
 
-#### Instructions
-1. Explore the payment process on `/upgrade`
-2. Identify the IDOR exploitation chain:
-   - Step 1: `/api/customer/transactions` → Retrieve a victim's `card_id`
-   - Step 2: `/api/cards/info/{card_id}` → Steal card details (number, CVV, expiration)
-   - Step 3: `/api/cards/init_payment` → Initialize payment with stolen data
-   - Step 4: `/api/cards/3dsecure/{card_id}` → Retrieve victim's OTP (Bypass 3D Secure!)
-   - Step 5: `/api/cards/confirm_payment/{payment_id}` → Confirm payment with stolen OTP
-3. Use Burp Suite Repeater with 3 tabs to orchestrate the attack
-4. Retrieve flag_3 after payment confirmation
+**🎯 Mission:** Complete unauthorized payment using stolen card + OTP
 
-#### Key Concepts
-- Complex IDOR exploitation chain
-- Bypassing strong authentication mechanisms (3D Secure)
-- Theft of sensitive banking data (PCI DSS violation)
-- Financial identity theft
+**💀 Attack Chain:** 5-step IDOR exploitation
 
-#### Output File
+**🔑 Key Steps:**
+1. **Step 1:** Get victim's `card_id` from `/api/customer/transactions`
+2. **Step 2:** Steal card details via `/api/cards/info/{card_id}`
+   - Number, CVV, expiration date 🔓
+3. **Step 3:** Initialize payment with stolen card: `/api/cards/init_payment`
+4. **Step 4:** 🚨 **CRITICAL EXPLOIT** → Get victim's OTP!
+   - `/api/cards/3dsecure/{card_id}` exposes the OTP
+5. **Step 5:** Confirm payment: `/api/cards/confirm_payment/{payment_id}`
+   - Use stolen card number + OTP
+6. Payment successful → Flag_3 captured! 🎯
+
+</td>
+<td width="30%">
+
+```ascii
+┌─────────────┐
+│ Difficulty  │
+├─────────────┤
+│⭐⭐⭐⭐Expert│
+└─────────────┘
+
+┌─────────────┐
+│  Critical!  │
+├─────────────┤
+│ • PCI DSS   │
+│   violation │
+│ • 3D Secure │
+│   bypass    │
+│ • Identity  │
+│   theft     │
+└─────────────┘
 ```
-3-flag.txt
-```
+
+**📁 Output:**
+`3-flag.txt`
+
+**✅ Score:** 100%
+
+</td>
+</tr>
+</table>
+
+<details>
+<summary>🎯 Pro Tip: Use 3 Repeater tabs</summary>
+
+Open 3 tabs in Burp Repeater for the attack chain:
+- Tab 1: Init payment
+- Tab 2: Get OTP
+- Tab 3: Confirm payment
+
+Execute them in sequence!
+
+</details>
 
 ---
 
-### Task 4: Crafting a Comprehensive Vulnerability Report
-**Mandatory**
+### 📋 Task 4: Professional Vulnerability Report
 
-#### Objective
-Compile all your findings into a professional, structured, and detailed vulnerability report suitable for presentation to a real financial institution.
+<table>
+<tr>
+<td width="70%">
 
-#### Report Structure
-1. **Introduction**
-   - Overview of CyberBank
-   - Security assessment objective
+**🎯 Mission:** Document your findings like a real penetration tester
 
-2. **Methodology**
-   - Tools used (Burp Suite, DevTools, cURL)
-   - Testing approach (gray-box)
+**📝 Report Structure:**
+1. **Introduction** - What is CyberBank? Why this assessment?
+2. **Methodology** - Tools used, testing approach
+3. **Vulnerability Details** - For EACH flaw:
+   - Technical description
+   - Severity/Impact rating
+   - Step-by-step reproduction
+   - Screenshots/evidence (request/response pairs)
+4. **Additional Findings** - Other issues discovered:
+   - Missing rate limiting
+   - Session timeout issues
+   - No MFA/2FA
+   - Logging gaps
+5. **Recommendations** - Specific fixes with code examples
+6. **Conclusion** - Summary of critical risks
+7. **References** - OWASP, PCI DSS, etc.
 
-3. **Vulnerability Details**
-   - For each vulnerability:
-     - Technical description
-     - Impact (criticality)
-     - Reproduction steps
-     - Evidence (screenshots, request/response pairs)
+</td>
+<td width="30%">
 
-4. **Additional Findings**
-   - Other identified security flaws:
-     - Lack of rate limiting
-     - Sessions without timeout
-     - Missing logging
-     - Absence of MFA
-     - Etc.
+```ascii
+┌─────────────┐
+│   Format    │
+├─────────────┤
+│ Google Docs │
+│ or PDF      │
+└─────────────┘
 
-5. **Recommendations**
-   - Specific and actionable solutions
-   - Secure code examples
-   - Priority action plan
-
-6. **Conclusion**
-   - Impact summary
-   - Urgency of fixes
-
-7. **References**
-   - OWASP, PortSwigger, PCI DSS, etc.
-
-#### Format
-- Google Docs (recommended for collaboration)
-- PDF (for final submission)
-- Public read-only sharing
-
-#### Output File
-```
-Google Docs link to submit
+┌─────────────┐
+│  Must Have  │
+├─────────────┤
+│ ✓ Screenshots│
+│ ✓ HTTP traces│
+│ ✓ Code fixes│
+│ ✓ Criticality│
+└─────────────┘
 ```
 
----
+**📤 Submission:**
+Google Docs link
+(public read-only)
 
-## 🛠️ Tools Used
+**✅ Mandatory**
 
-### Burp Suite
-- **Proxy**: HTTP/S traffic interception
-- **Repeater**: Manual testing and request manipulation
-- **Intruder**: Attack automation through enumeration
+</td>
+</tr>
+</table>
 
-### Browser DevTools (F12)
-- **Network Tab**: API request analysis
-- **Console**: JavaScript debugging
-- **Application Tab**: Cookie inspection
+<details>
+<summary>📸 Screenshot Checklist</summary>
 
-### Command Line Tools
+Essential screenshots to include:
+- [ ] User enumeration (Task 0)
+- [ ] Account balance disclosure (Task 1)
+- [ ] Burp Intruder results (Task 2)
+- [ ] OTP exposure (Task 3)
+- [ ] Successful exploits with flags
+
+</details>
+
+## 🛠️ Tools & Setup
+
+<div align="center">
+
+### 🎯 Your Hacker Toolkit
+
+</div>
+
+<table>
+<tr>
+<td width="33%">
+
+### 🔥 Burp Suite
+**The Swiss Army Knife**
+
+- **Proxy** - Intercept HTTP/S
+- **Repeater** - Manual testing
+- **Intruder** - Automated attacks
+- **Decoder** - Decode data
+
 ```bash
-# cURL - Command-line API testing
-curl -H "Cookie: session=XXX" http://web0x06.hbtn/api/customer/info/me
+# Free version includes
+# all essential features!
+```
 
-# jq - JSON parser
+</td>
+<td width="33%">
+
+### 🌐 Browser DevTools
+**Built-in Power Tools**
+
+- **Network Tab** - API monitoring
+- **Console** - JavaScript debug
+- **Application** - Cookie inspector
+- **Sources** - Code review
+
+```bash
+# Shortcut: F12
+# Chrome, Firefox, Edge
+```
+
+</td>
+<td width="33%">
+
+### ⚙️ Command Line
+**Terminal Ninjas**
+
+- **cURL** - API testing
+- **jq** - JSON parsing
+- **grep** - Pattern search
+- **wget** - File download
+
+```bash
+# Install on Ubuntu:
+sudo apt install curl jq
+```
+
+</td>
+</tr>
+</table>
+
+### 📦 Quick Start Commands
+
+```bash
+# Test an endpoint with cURL
+curl -H "Cookie: session=YOUR_SESSION" \
+     http://web0x06.hbtn/api/customer/info/me | jq .
+
+# Pretty-print JSON response
+curl -s http://web0x06.hbtn/api/customer/transactions | jq '.[]'
+
+# Extract specific fields
 curl -s http://web0x06.hbtn/api/customer/transactions | jq '.[].account_id'
 ```
 
@@ -309,69 +584,108 @@ curl -s http://web0x06.hbtn/api/customer/transactions | jq '.[].account_id'
 
 ```
 0x06_idor/
-├── README.md                    # This file
-├── .gitignore                   # Files not to commit
 │
-├── 0-flag.txt                   # Flag Task 0 (User IDs)
-├── 1-flag.txt                   # Flag Task 1 (Account Numbers)
-├── 2-flag.txt                   # Flag Task 2 (Wire Transfers)
-├── 3-flag.txt                   # Flag Task 3 (3D Secure Bypass)
+├── 📄 README.md                 ← You are here!
+├── 🚫 .gitignore                ← Keep secrets safe
 │
-├── WRITEUP_TASK_0.md           # Task 0 documentation (not committed)
-├── WRITEUP_TASK_1.md           # Task 1 documentation (not committed)
-├── WRITEUP_TASK_2_BURP.md      # Task 2 documentation (not committed)
-├── WRITEUP_TASK_3_BURP.md      # Task 3 documentation (not committed)
+├── 🚩 0-flag.txt                ← Task 0: User IDs
+├── 🚩 1-flag.txt                ← Task 1: Account Numbers  
+├── 🚩 2-flag.txt                ← Task 2: Wire Transfers ($10k!)
+├── 🚩 3-flag.txt                ← Task 3: 3D Secure Bypass
 │
-└── VULNERABILITY_REPORT.md     # Complete report (not committed)
+├── 📝 WRITEUP_TASK_0.md        ← Detailed solutions (not committed)
+├── 📝 WRITEUP_TASK_1.md        
+├── 📝 WRITEUP_TASK_2_BURP.md   
+├── 📝 WRITEUP_TASK_3_BURP.md   
+│
+└── 📋 VULNERABILITY_REPORT.md  ← Professional report (not committed)
 ```
 
 ---
 
-## 🎓 Key Concepts Covered
+## 🎓 Key Concepts Deep Dive
 
-### 1. IDOR (Insecure Direct Object References)
-Manipulation of direct references to internal objects to access unauthorized resources.
+<details>
+<summary><b>🔍 1. IDOR - Insecure Direct Object References</b></summary>
 
-### 2. Broken Access Control
-Failure in access control mechanisms allowing a user to perform actions beyond their privileges.
+**What it is:** Direct access to resources using predictable identifiers without authorization checks.
 
-### 3. Information Disclosure
-Unintentional exposure of sensitive information (IDs, balances, credentials).
+**Example Attack:**
+```http
+GET /api/customer/info/123  ← Attacker changes ID
+Host: vulnerable-bank.com
+Cookie: session=attacker_session
 
-### 4. Horizontal Privilege Escalation
-Access to data of other users at the same privilege level.
+→ Returns victim's data! 🚨
+```
 
-### 5. Business Logic Flaws
-Exploitation of business logic (transfers, payments) for fraudulent actions.
+**Real-world cases:**
+- USPS informed delivery breach (2018)
+- Instagram account takeovers
+- Financial institutions data leaks
+
+</details>
+
+<details>
+<summary><b>🚪 2. Broken Access Control (OWASP #1)</b></summary>
+
+**Why it's #1:** Most common vulnerability in 2021-2024.
+
+**Variants:**
+- Horizontal escalation (access peer's data)
+- Vertical escalation (access admin functions)
+- Missing function-level controls
+
+**Impact:** Complete system compromise
+
+</details>
+
+<details>
+<summary><b>🔓 3. Information Disclosure</b></summary>
+
+**Sources of leaks:**
+- API responses with extra data
+- Error messages (stack traces)
+- URLs revealing structures
+- Hidden form fields
+
+**In CyberBank:**
+- `/api/customer/contacts` lists all users
+- Transaction history exposes account IDs
+
+</details>
+
+<details>
+<summary><b>💼 4. Business Logic Flaws</b></summary>
+
+**Definition:** Exploiting application workflows for unintended behavior.
+
+**Examples:**
+- Transfer negative amounts → increase balance
+- Race conditions in payment processing  
+- Bypass multi-step validations
+
+**CyberBank case:** Transfer from ANY account without ownership check
+
+</details>
 
 ---
 
-## ⚠️ Legal and Ethical Warnings
+## 📊 Progress Tracker
 
-### ⚖️ Important
-- ✅ This project is an **authorized learning environment**
-- ❌ **NEVER** apply these techniques on real systems without authorization
-- ⚠️ Unauthorized hacking is **illegal** and prosecutable
-- 🎯 Use these skills **ethically**: bug bounties, authorized pentests
+<div align="center">
 
-### Ethical Hacking Guidelines
-1. Always obtain **written authorization** before testing
-2. Respect the defined **scope** of the test
-3. **Report** vulnerabilities responsibly
-4. **Never** cause damage or access unnecessary data
-5. Maintain **confidentiality** of findings
+| Task | Challenge | Difficulty | Status | Score |
+|:----:|-----------|:----------:|:------:|:-----:|
+| 0️⃣ | Uncovering User IDs | ⭐ Easy | ✅ | 100% |
+| 1️⃣ | Account Enumeration | ⭐⭐ Medium | ✅ | 100% |
+| 2️⃣ | Wire Transfer Exploit | ⭐⭐⭐ Hard | ✅ | 100% |
+| 3️⃣ | 3D Secure Bypass | ⭐⭐⭐⭐ Expert | ✅ | 100% |
+| 4️⃣ | Vulnerability Report | 📝 Writing | 🔄 | - |
 
----
+### 🏆 Total Score: **400/400** Points!
 
-## 📊 Progress
-
-| Task | Description | Status | Score |
-|------|-------------|--------|-------|
-| 0 | Uncovering User IDs | ✅ | 100% |
-| 1 | Enumerating Account Numbers | ✅ | 100% |
-| 2 | Wire Transfer Exploitation | ✅ | 100% |
-| 3 | Bypassing 3D Secure | ✅ | 100% |
-| 4 | Vulnerability Report | 📝 | - |
+</div>
 
 ---
 
