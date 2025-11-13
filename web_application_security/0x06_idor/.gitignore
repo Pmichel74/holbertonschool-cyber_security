@@ -1,0 +1,20 @@
+# Writeups et documentation technique (ne pas push)
+WRITEUP_TASK_0.md
+WRITEUP_TASK_1.md
+WRITEUP_TASK_2_BURP.md
+WRITEUP_TASK_3_BURP.md
+VULNERABILITY_REPORT.md
+
+# Notes personnelles
+notes.md
+*.local.md
+
+# Screenshots et preuves
+screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Cookies et sessions
+*.cookie
+session.txt
