@@ -138,5 +138,5 @@ def main():
     # Perform replacement
     search_and_replace(pid, search_str, replace_str, heap_start, heap_end)
 
-if __name__ == "__main__":
-    main()
+
+main()
