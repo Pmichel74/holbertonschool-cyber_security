@@ -32,7 +32,9 @@ def read_write_heap(pid, search_string, replace_string):
                 sys.exit(1)
 
             # Extract start and end addresses of the heap
-            heap_start, heap_end = [int(x, 16) for x in heap.split()[0].split("-")]
+            addresses = heap.split()[0].split("-")
+            heap_start = int(addresses[0], 16)
+            heap_end = int(addresses[1], 16)
 
         # Open the memory file for reading and writing
         with open(mem_path, "r+b") as mem_file:
@@ -51,7 +53,9 @@ def read_write_heap(pid, search_string, replace_string):
 
             # Replace the string
             mem_file.seek(heap_start + offset)
-            mem_file.write(replace_bytes.ljust(len(search_bytes), b'\x00'))
+            mem_file.write(
+                replace_bytes.ljust(len(search_bytes), b'\x00')
+            )
 
     except (PermissionError, FileNotFoundError, Exception):
         sys.exit(1)
