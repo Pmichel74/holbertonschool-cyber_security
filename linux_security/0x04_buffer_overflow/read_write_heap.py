@@ -105,7 +105,7 @@ def search_and_replace(pid, search_str, replace_str, heap_start, heap_end):
             mem_file.seek(address)
 
             # Write the new string (+ null terminator for C)
-            mem_file.write(replace_bytes + b'\0')
+            mem_file.write(replace_bytes.ljust(len(search_bytes), b'\x00'))
 
             return True
 
@@ -139,5 +139,5 @@ def main():
     search_and_replace(pid, search_str, replace_str, heap_start, heap_end)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
