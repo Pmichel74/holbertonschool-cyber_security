@@ -139,4 +139,5 @@ def main():
     search_and_replace(pid, search_str, replace_str, heap_start, heap_end)
 
 
-main()
+if __name__ == '__main__':
+    main()
