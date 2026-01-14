@@ -9,11 +9,19 @@ def get_request(url)
   # Parse the URL string into a URI object
   uri = URI(url)
 
-  # Perform the GET request and get the response directly
-  response = Net::HTTP.get_response(uri)
+  # Create an HTTP GET request object
+  http = Net::HTTP.new(uri.host, uri.port)
 
-  # Extract the status code and reason phrase
+  # If the URL uses HTTPS, enable SSL
+  http.use_ssl = true if uri.scheme == 'https'
+
+  # Perform the GET request
+  response = http.get(uri.path)
+
+  # Extract the status code and convert to string (e.g., 200 -> "200")
   status_code = response.code
+
+  # Extract the reason phrase (e.g., "OK", "Not Found")
   reason_phrase = response.message
 
   # Print the response status
