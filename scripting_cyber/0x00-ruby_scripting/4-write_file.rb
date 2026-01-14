@@ -10,8 +10,17 @@ def merge_json_files(file1_path, file2_path)
   # Read and parse the second JSON file into a Ruby array/hash
   data2 = JSON.parse(File.read(file2_path))
 
-  # Merge the two arrays (data2 first, then data1)
-  merged_data = data2 + data1
+  # Check if data is arrays or hashes and merge accordingly
+  if data1.is_a?(Array) && data2.is_a?(Array)
+    # Concatenate arrays (data2 first, then data1)
+    merged_data = data2 + data1
+  elsif data1.is_a?(Hash) && data2.is_a?(Hash)
+    # Merge hashes (data2 is overridden by data1 if keys conflict)
+    merged_data = data2.merge(data1)
+  else
+    # If types don't match, just concatenate or merge what we can
+    merged_data = data2 + data1
+  end
 
   # Open file2 in write mode ('w' = overwrite)
   File.open(file2_path, 'w') do |f|
