@@ -1,37 +1,39 @@
 #!/usr/bin/env ruby
 
-# Import the net/http library for making HTTP requests
 require 'net/http'
 require 'uri'
 require 'json'
 
-# Function to perform an HTTP GET request
+# Function that performs an HTTP GET request to the specified URL
+# and prints the response status code and body in JSON format
 def get_request(url)
-  # Parse the URL string into a URI object
+  # Parse the URL
   uri = URI(url)
 
-  # Create an HTTP GET request object
+  # Create an HTTP object
   http = Net::HTTP.new(uri.host, uri.port)
 
-  # If the URL uses HTTPS, enable SSL
-  http.use_ssl = true if uri.scheme == 'https'
+  # Set to use SSL if the URL uses HTTPS
+  http.use_ssl = (uri.scheme == 'https')
 
-  # Perform the GET request
-  response = http.get(uri.path)
+  # Create a GET request
+  request = Net::HTTP::Get.new(uri.request_uri)
 
-  # Extract the status code and convert to string (e.g., 200 -> "200")
-  status_code = response.code
-
-  # Extract the reason phrase (e.g., "OK", "Not Found")
-  reason_phrase = response.message
+  # Send the request and get the response
+  response = http.request(request)
 
   # Print the response status
-  puts "Response status: #{status_code} #{reason_phrase}"
+  puts "Response status: #{response.code} #{response.message}"
 
   # Print the response body
-  puts "\nResponse body:\n"
+  puts "Response body:"
 
-  # Pretty print the JSON response for better readability
-  parsed_body = JSON.parse(response.body)
-  puts JSON.pretty_generate(parsed_body)
+  # If the response is JSON, pretty print it
+  begin
+    json_response = JSON.parse(response.body)
+    puts JSON.pretty_generate(json_response)
+  rescue JSON::ParserError
+    # If it's not valid JSON, just print the body as is
+    puts response.body
+  end
 end
