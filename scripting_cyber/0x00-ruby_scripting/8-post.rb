@@ -42,4 +42,5 @@ def post_request(url, body_params)
     # If it's not valid JSON, just print the body as is
     puts response.body
   end
+  puts
 end
