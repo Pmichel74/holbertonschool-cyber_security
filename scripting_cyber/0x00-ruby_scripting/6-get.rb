@@ -2,6 +2,7 @@
 
 # Import the net/http library for making HTTP requests
 require 'net/http'
+require 'uri'
 require 'json'
 
 # Function to perform an HTTP GET request
